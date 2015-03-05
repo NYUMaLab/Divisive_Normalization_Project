@@ -119,8 +119,8 @@ Also we don't want complex division in the neural computations so:
 \begin{equation}
 \begin{aligned}
 F_i(\mu_j, \alpha_j, \tau_j) &= e^{\Psi(\alpha_j) - \Psi(\sum_{j=1}^J \alpha_j) - \frac{(s_i^{\text{pref}} - \frac{\eta_j}{\tau_j})^2 + \tau_j^{-1}}{2 \sigma_{\text{tc}}^2}}\\
-p_{ij} &= F_i(\mu_j, \alpha_j, \tau_j) \pi_{ij}\\
-\pi_{ij} &= \frac{1}{\sum_{j=1}^J F_i(\mu_j, \alpha_j, \tau_j)}
+p_{ij} &= F_i(\mu_j, \alpha_j, \tau_j) \pi_i\\
+\pi_i &= \frac{1}{\sum_{j=1}^J F_i(\mu_j, \alpha_j, \tau_j)}
 \end{aligned}
 \end{equation}
 
@@ -129,9 +129,9 @@ And now we have update equations:
 \begin{aligned}
 \frac{d \eta_j}{dt} &= - \eta_j + \frac{1}{2 \sigma_{\text{tc}}^2} \sum_{i=1}^I s_i^{\text{pref}} r_i p_{ij}\\
 \frac{d \tau_j}{dt} &= - \tau_j + \frac{1}{2 \sigma_{\text{tc}}^2} \sum_{i=1}^I r_i p_{ij}\\
-\frac{d p_{ij}}{dt} &= - p_{ij} + F_i(\mu_j, \alpha_j, \tau_j) \pi_{ij}\\
-\frac{d \pi_{ij}}{dt} &= 1 - \pi_{ij} \sum_{j=1}^J F_i(\mu_j, \alpha_j, \tau_j)\\
-\frac{d \alpha_j}{dt} &= - \alpha_j + \rho_j - 1 + \sum_i r_i p_{ij}\\
+\frac{d p_{ij}}{dt} &= - p_{ij} + F_i(\mu_j, \alpha_j, \tau_j) \pi_i\\
+\frac{d \pi_i}{dt} &= 1 - \pi_i \sum_{j=1}^J F_i(\mu_j, \alpha_j, \tau_j)\\
+\frac{d \alpha_j}{dt} &= - \alpha_j + \rho_j - 1 + \sum_i^I r_i p_{ij}\\
 \end{aligned}
 \end{equation}
 \iffalse
