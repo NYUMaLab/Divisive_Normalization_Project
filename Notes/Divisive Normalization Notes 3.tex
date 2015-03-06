@@ -124,6 +124,18 @@ p_{ij} &= F_i(\mu_j, \alpha_j, \tau_j) \pi_i\\
 \end{aligned}
 \end{equation}
 
+For simulation purposes:
+\begin{equation}
+\begin{aligned}
+f_{ij} &= \Psi(\alpha_j) - \Psi(\sum_{j=1}^J \alpha_j) - \frac{(s_i^{\text{pref}} - \frac{\eta_j}{\tau_j})^2 + \tau_j^{-1}}{2 \sigma_{\text{tc}}^2}\\
+f_i^* &= \max_J f_{ij}\\
+\pi_i &= \sum_{j=1}^J e^{f_{ij}} = e^{f_i^*} \sum_{j \neq \arg \max_J} e^{f_{ij} - f_i^*}\\
+\log \pi_i &= f_i^* + \log \sum_{j \neq \arg \max_J} e^{f_{ij} - f_i^*}\\
+p_{ij} &= \frac{e^{f_{ij}}}{\pi_i} = e^{f_{ij} - \log \pi_i}\\
+\log p_{ij} &= f_{ij} - \log \pi_i = f_{ij} - f_i^* + \log \sum_{j \neq \arg \max_J} e^{f_{ij} - f_i^*}
+\end{aligned}
+\end{equation}
+
 And now we have update equations: 
 \begin{equation}
 \begin{aligned}
@@ -134,6 +146,18 @@ And now we have update equations:
 \frac{d \alpha_j}{dt} &= - \alpha_j + \rho_j - 1 + \sum_i^I r_i p_{ij}\\
 \end{aligned}
 \end{equation}
+
+Agan for simulation purposes ($p_{ij} = \log p_{ij}$):
+\begin{equation}
+\begin{aligned}
+\frac{d \eta_j}{dt} &= - \eta_j + \frac{1}{2 \sigma_{\text{tc}}^2} \sum_{i=1}^I s_i^{\text{pref}} r_i e^{p_{ij}}\\
+\frac{d \tau_j}{dt} &= - \tau_j + \frac{1}{2 \sigma_{\text{tc}}^2} \sum_{i=1}^I r_i e^{p_{ij}}\\
+\frac{d p_{ij}}{dt} &= - p_{ij} + f_{ij} - \max_J f_{ij} + \log \sum_{j \neq \arg \max_J} e^{f_{ij} - \max_J f_{ij}}\\
+\frac{d \alpha_j}{dt} &= - \alpha_j + \rho_j - 1 + \sum_i^I r_i e^{p_{ij}}\\
+\frac{d f_{ij}}{dt} &= - f_{ij} + \Psi(\alpha_j) - \Psi(\sum_{j=1}^J \alpha_j) - \frac{(s_i^{\text{pref}} - \frac{\eta_j}{\tau_j})^2 + \tau_j^{-1}}{2 \sigma_{\text{tc}}^2}\\
+\end{aligned}
+\end{equation}
+
 \iffalse
 (Assume normalization is $\tau$ then we want to normalize all p terms by $\frac{1}{\tau}$. $\tau^{-1} = \prod C^{N_{ij}} = C^{\sum_j N_{ij}} = $ constant)
 \fi
