@@ -38,7 +38,7 @@ $r_i = \sum_j N_{ij}$\\
 P(\mathbf{c, s|r}) & = \sum_\mathbf{N} P(\mathbf{N, c, s|r}) \\
 P(\mathbf{N, c, s|r}) 
 & =  P(\mathbf{r|N}) P(\mathbf{N|c, s}) P(\mathbf{c}) P(\mathbf{s})\\
-&\propto \prod_i \left[\delta \Big( r_i - \sum_j N_{ij} \Big) \bigg( \prod_j\frac{(f_i(s_j)c_j)^{N_{ij}}}{N_{ij}!} \bigg) \right] \prod_j \frac{1}{\mathbf{\beta}(\rho)} c_j^{\rho_j - 1} 
+&\propto \prod_i \left[\delta \Big(r_i - \sum_j N_{ij} \Big) \bigg( \prod_j\frac{(f_i(s_j)c_j)^{N_{ij}}}{N_{ij}!} \bigg) \right] \prod_j \frac{1}{\mathbf{\beta}(\rho)} c_j^{\rho_j - 1} 
 \end{aligned}
 \end{equation}
 For the variational inference, we need\\
@@ -48,6 +48,7 @@ For the variational inference, we need\\
 & \phantom{{}=1} + \sum_j (\rho_j - 1)\log c_j
 \end{aligned}
 \end{equation}
+
 \subsection{Variational approximation}
 Then we approximate this using a factorized distribution:
 \begin{equation}
@@ -57,7 +58,7 @@ Q(\mathbf{N, c, s|r}) = Q(\mathbf{N|r}) Q(\mathbf{c|r}) Q(\mathbf{s|r})
 \begin{aligned}
 \log Q(\mathbf{N}|\mathbf{r}) &= \sum_i \log Q(\mathbf{N}_i|\mathbf{r}_i)\\
 \log Q(\mathbf{N}_i|\mathbf{r}_i) &= \langle \log P(\mathbf{N_i, c, s|r_i}) \rangle_{Q(\mathbf{c|r})Q(\mathbf{s|r})}\\
-&= \log(\delta \Big( r_i - \sum_j N_{ij} \Big) + \sum_j N_{ij}\big( \langle \log c_j \rangle + \langle \log f_i(s_j) \rangle \big) - \sum_j \log N_{ij}!\\
+&= \log(\delta \Big( r_i - \sum_j N_{ij} \Big) + \sum_j N_{ij}\big( \langle \log c_j \rangle_{Q(\mathbf{c|r})} + \langle \log f_i(s_j) \rangle_{Q(\mathbf{s|r})} \big) - \sum_j \log N_{ij}!\\
 \log Q(\mathbf{c|r}) &= \langle \log P(\mathbf{N, c, s|r}) \rangle_{Q(\mathbf{N|r})Q(\mathbf{s|r})}\\
 &= \sum_j [\log (c_j \rho_j - 1) + \sum_i \langle N_{ij} \rangle_{Q(\mathbf{N|r})}]\\
 \log Q(\mathbf{s|r}) &= \langle \log P(\mathbf{N, c, s|r}) \rangle_{Q(\mathbf{N|r})Q(\mathbf{c|r})}\\
