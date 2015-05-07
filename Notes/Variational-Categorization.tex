@@ -68,7 +68,7 @@ Q(C, s|\mathbf{r}) = Q(C|\mathbf{r}) Q(s|\mathbf{r})
 Q(C|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(s|\mathbf{r})}\\
 &= \frac{C \Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log \Big(\frac{\tau_0 - C \Delta \tau}{2 \pi} \Big)\\
 &\propto \frac{\langle s^2 \rangle_{Q(s|\mathbf{r})} \Delta \tau}{2} C\\
-&\sim \text{Binom}(C, p)\\
+&\sim \text{Bernoulli}(C, p)\\
 p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{\langle s^2 \rangle_{Q(s|\mathbf{r})} \Delta \tau}{2}}}
 \end{aligned}
 \end{equation}
@@ -77,9 +77,29 @@ p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{\langle s^2 \rangle_{Q(s
 \begin{aligned}
 Q(s|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}\\
 &= \sum_i r_i \log(f_i(s)) + \frac{- (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}{2} s^2\\
-&\propto \frac{1}{2 \sigma^2_{\text{tc}}} \sum_i r_i (s - s_i^{\text{pref}})^2 + \frac{- (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}{2} s^2
+&\propto \frac{1}{2 \sigma^2_{\text{tc}}} \sum_i r_i (s - s_i^{\text{pref}})^2 + \frac{- (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}{2} s^2\\
+&\sim \mathcal{N} (\mu, \tau)\\
+\mu &= \sum_i \frac{\sigma^2_{\text{tc}}}{r_i} s_i^{\text{pref}}\\
+\tau &= \sum_i \frac{\sigma^2_{\text{tc}}}{r_i} + (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)\\
+&= \sum_i \frac{\sigma^2_{\text{tc}}}{r_i} + (\tau_0 - p \Delta \tau)
 \end{aligned}
 \end{equation}
 
+Also
+
+\begin{equation}
+\begin{aligned}
+\langle s^2 \rangle_{Q(s|\mathbf{r})} &= \mu^2 + \frac{1}{\tau}\\
+\end{aligned}
+\end{equation}
+
+So we have update equations:
+\begin{equation}
+\begin{aligned}
+\frac{dp}{dt} &= 1 - p(1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{\mu^2 + \frac{1}{\tau} \Delta \tau}{2}})\\
+\frac{d \tau}{dt} &= -\tau + \sum_i \frac{\sigma^2_{\text{tc}}}{r_i} + (\tau_0 - p \Delta \tau)\\
+\mu &= \sum_i \frac{\sigma^2_{\text{tc}}}{r_i} s_i^{\text{pref}}\\
+\end{aligned}
+\end{equation}
 
 \end{document}
