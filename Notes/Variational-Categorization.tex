@@ -82,24 +82,27 @@ Q(s|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}\\
 \tau &= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)\\
 &= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - p \Delta \tau)\\
 \mu &= \frac{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}}{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}\\
-&= \frac{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}}{\tau}
+&= \frac{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}}{\tau}\\
+\eta &= \mu \tau\\
+&= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}
 \end{aligned}
 \end{equation}
+
+($\eta$ and $\tau$ are natural parameters)
 
 Also
 
 \begin{equation}
 \begin{aligned}
-\langle s^2 \rangle_{Q(s|\mathbf{r})} &= \mu^2 + \frac{1}{\tau}\\
+\langle s^2 \rangle_{Q(s|\mathbf{r})} &= \frac{\eta}{\tau})^2 + \frac{1}{\tau}\\
 \end{aligned}
 \end{equation}
 
-So we have update equations:
+So we have update equations ($\eta$ is a constant):
 \begin{equation}
 \begin{aligned}
-\frac{dp}{dt} &= 1 - p(1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{\mu^2 + \frac{1}{\tau} \Delta \tau}{2}})\\
+\frac{dp}{dt} &= 1 - p(1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{(\frac{\eta}{\tau})^2 + \frac{1}{\tau} \Delta \tau}{2}})\\
 \frac{d \tau}{dt} &= -\tau + \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - p \Delta \tau)\\
-\frac{d \mu}{dt} &= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}} - \mu \tau\\
 \end{aligned}
 \end{equation}
 
