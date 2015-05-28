@@ -65,11 +65,15 @@ Q(C, s|\mathbf{r}) = Q(C|\mathbf{r}) Q(s|\mathbf{r})
 
 \begin{equation}
 \begin{aligned}
-Q(C|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(s|\mathbf{r})}\\
+\log Q(C|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(s|\mathbf{r})}\\
 &= \frac{C \Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log \Big(\frac{\tau_0 - C \Delta \tau}{2 \pi} \Big)\\
-&\propto \frac{\langle s^2 \rangle_{Q(s|\mathbf{r})} \Delta \tau}{2} C\\
-&\sim \text{Bernoulli}(C, p)\\
-p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{\langle s^2 \rangle_{Q(s|\mathbf{r})} \Delta \tau}{2}}}
+&\propto \frac{C \Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log (\tau_0 - C \Delta \tau)\\
+\log Q(C = 1|\mathbf{r}) &\propto \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log (\tau_0 - \Delta \tau)\\
+\log Q(C = 0|\mathbf{r}) &\propto \frac{1}{2} \log (\tau_0)\\
+\log \frac{Q(C = 1|\mathbf{r})}{Q(C = 0|\mathbf{r})} &= \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log \Big( \frac{\tau_1}{\tau_0} \Big)\\
+Q(C = 1|\mathbf{r}) &= \frac{1}{1 + e^{-\log \frac{Q(C = 1|\mathbf{r})}{Q(C = 0|\mathbf{r})}}}\\
+Q(C|\mathbf{r}) & \sim \text{Bernoulli}(p)\\
+p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{- \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})}}}
 \end{aligned}
 \end{equation}
 
@@ -101,7 +105,7 @@ Also
 So we have update equations ($\eta$ is a constant):
 \begin{equation}
 \begin{aligned}
-\frac{dp}{dt} &= 1 - p(1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{\frac{(\frac{\eta}{\tau})^2 + \frac{1}{\tau} \Delta \tau}{2}})\\
+\frac{dp}{dt} &= 1 - p(1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{-\frac{((\frac{\eta}{\tau})^2 + \frac{1}{\tau}) \Delta \tau}{2}})\\
 \frac{d \tau}{dt} &= -\tau + \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - p \Delta \tau)\\
 \end{aligned}
 \end{equation}
