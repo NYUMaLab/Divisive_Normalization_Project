@@ -110,4 +110,16 @@ So we have update equations ($\eta$ is a constant):
 \end{aligned}
 \end{equation}
 
+Analytic posterior:
+
+From Qamar et al. (2013) we have
+\begin{equation}
+\begin{aligned}
+\sigma_0^2 &= \frac{1}{\tau_0}\\
+\sigma_1^2 &= \frac{1}{\tau_1}\\
+\log \frac{P(\mathbf{r}|C = 0)}{P(\mathbf{r}|C = 1)} &= \frac{1}{2} \log \frac{1 + \sigma_1^2 \mathbf{a} \cdot \mathbf{r}}{1 + \sigma_0^2\mathbf{a} \cdot \mathbf{r}} - \frac{(\sigma_1^2 - \sigma_0^2)(\mathbf{b} \cdot \mathbf{r})^2}{2 (1 + \sigma_0^2 \mathbf{a} \cdot \mathbf{r})(1 + \sigma_1^2 \mathbf{a} \cdot \mathbf{r})}\\
+P(\mathbf{r}|C = 0) &= \frac{1}{1 + e^{-(\frac{1}{2} \log \frac{1 + \sigma_1^2 \mathbf{a} \cdot \mathbf{r}}{1 + \sigma_0^2\mathbf{a} \cdot \mathbf{r}} - \frac{(\sigma_1^2 - \sigma_0^2)(\mathbf{b} \cdot \mathbf{r})^2}{2 (1 + \sigma_0^2 \mathbf{a} \cdot \mathbf{r})(1 + \sigma_1^2 \mathbf{a} \cdot \mathbf{r})})}}
+\end{aligned}
+\end{equation}
+
 \end{document}
