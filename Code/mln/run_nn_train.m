@@ -10,7 +10,7 @@ ftype   = 'relu';
 
 % training parameters
 eta   = 0.001;
-nepch = 10;
+nepch = 100;
 bsize = 2; 
 
 % generate data
@@ -29,8 +29,8 @@ Ydata        = P';
 W_init = cell(L,1);
 b_init = cell(L,1);
 for l=2:L
-    W_init{l} = .1*rand(nnode(l),nnode(l-1));
-    b_init{l} = .1*randn(nnode(l),1);
+    W_init{l} = .05*rand(nnode(l),nnode(l-1));
+    b_init{l} = .05*randn(nnode(l),1);
 end
 
 
