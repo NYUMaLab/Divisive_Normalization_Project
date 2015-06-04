@@ -5,12 +5,12 @@ tic
 % network parameters
 L       = 3;
 nneuron = 41;
-nnode   = [nneuron 8 1];
+nnode   = [nneuron 16 1];
 ftype   = 'relu';
 
 % training parameters
 eta   = 0.001;
-nepch = 100;
+nepch = 30;
 bsize = 2; 
 
 % generate data
@@ -29,8 +29,8 @@ Ydata        = P';
 W_init = cell(L,1);
 b_init = cell(L,1);
 for l=2:L
-    W_init{l} = .05*rand(nnode(l),nnode(l-1));
-    b_init{l} = .05*randn(nnode(l),1);
+    W_init{l} = .5*rand(nnode(l),nnode(l-1));
+    b_init{l} = .5*randn(nnode(l),1);
 end
 
 
