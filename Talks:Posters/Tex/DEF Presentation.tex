@@ -105,7 +105,9 @@
   	One proposal: variational inference (Beck et al. 2012)
    \begin{itemize}
     \item
-    	Assume a parametric form of distributions for approximation and then use coordinate ascent to minimize KL divergence to true posterior
+    	Assume a parametric form of distributions for approximation and then use coordinate ascent (EM) to minimize KL divergence to true posterior
+   \item
+   	The coordinate ascent method produces dynamic equations which could be implemented by neurons after a lot of training
   \end{itemize}
     \item
    	Requires analytic derivation of coordinate ascent equations
@@ -170,16 +172,25 @@
 \end{frame}
 
 \begin{frame}{Results}
+\begin{columns}[T]
+    \begin{column}{.5\textwidth}
   \begin{itemize}
   \item
   	...None
   \item
   	Seems to be very difficult to learn distributions
-  \item
-  	Especially difficult for model to learn that lower layer has independent preferred orientations due to variational assumption
+  	\begin{itemize}
+	 \item
+  		Perhaps due to variational assumption about weights
+	 \end{itemize}
   \item
   	Tried simplifying models and smarter learning rates (RMSProp)
   \end{itemize}
+  \end{column}
+  \begin{column}{.5\textwidth}
+   	\includegraphics[width = 1\textwidth]{kl.pdf}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Conclusions/Future Work}
