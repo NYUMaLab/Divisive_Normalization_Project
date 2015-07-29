@@ -15,6 +15,7 @@ We consider the problem of categorizing stimuli with overlapping distributions
  \end{tikzpicture}
  \\
 $C$ is the category distribution ($\in \{0, 1\})$\\
+$C$ is the category, $s$ is the stimulus, $\mathbf{r}$ is the neural response and $\tau_C$ is the precision of the $C$ distribution\\
 $P(C) = .5$\\ 
 $s$ is the presented stimulus, a draw from the selected category distribution\\
 $P(s|C) = \mathcal{N} (s; 0, \sigma_{\text{C}}^2) = \mathcal{N} (s; 0, \tau_{\text{C}}^{-1})$\\
@@ -33,7 +34,7 @@ Tuning curve assumptions:
 \begin{aligned}
 P(C, s|\mathbf{r}) &= \Big(\prod_i P(r_i|s)\Big) P(s|C) P(C)\\
 &\propto \Big(\prod_i \text{Poisson}(r_i; f_i(s))\Big) \mathcal{N} (s; 0, \tau_{\text{C}}^{-1})\\
-&= \Big(\prod_i \frac{f_i(s)^{r_i}}{r_i!} \Big) \sqrt{\frac{\tau_C}{2 \pi}} e^{\frac{-\tau_C s^2}{2}}
+P(C, s|\mathbf{r}) &= \Big(\prod_i \frac{f_i(s)^{r_i}}{r_i!} \Big) \sqrt{\frac{\tau_C}{2 \pi}} e^{\frac{-\tau_C s^2}{2}}
 \end{aligned}
 \end{equation}
 
@@ -73,13 +74,15 @@ Q(C, s|\mathbf{r}) = Q(C|\mathbf{r}) Q(s|\mathbf{r})
 \log \frac{Q(C = 1|\mathbf{r})}{Q(C = 0|\mathbf{r})} &= \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})} + \frac{1}{2} \log \Big( \frac{\tau_1}{\tau_0} \Big)\\
 Q(C = 1|\mathbf{r}) &= \frac{1}{1 + e^{-\log \frac{Q(C = 1|\mathbf{r})}{Q(C = 0|\mathbf{r})}}}\\
 Q(C|\mathbf{r}) & \sim \text{Bernoulli}(p)\\
-p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{- \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})}}}
+p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{- \frac{\Delta \tau}{2} \langle s^2 \rangle_{Q(s|\mathbf{r})}}}\\
+Q(C|\mathbf{r}) & \sim \text{Bernoulli}(p)\\
+p &= \frac{1}{1 + \sqrt{\frac{\tau_0}{\tau_1}} e^{- \frac{\Delta \tau}{2} (\frac{\eta}{\tau})^2 + \frac{1}{\tau}}}
 \end{aligned}
 \end{equation}
 
 \begin{equation}
 \begin{aligned}
-Q(s|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}\\
+\log Q(s|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}\\
 &= \sum_i r_i \log(f_i(s)) + \frac{- (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}{2} s^2\\
 &\propto \frac{1}{2 \sigma^2_{\text{tc}}} \sum_i r_i (s - s_i^{\text{pref}})^2 + \frac{- (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}{2} s^2\\
 &\sim \mathcal{N} (\mu, \tau)\\
@@ -88,7 +91,10 @@ Q(s|\mathbf{r}) &= \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}\\
 \mu &= \frac{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}}{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - \langle C \rangle_{Q(C|\mathbf{r})} \Delta \tau)}\\
 &= \frac{\sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}}{\tau}\\
 \eta &= \mu \tau\\
-&= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}
+&= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}\\
+Q(s|\mathbf{r}) &\sim \mathcal{N} (\eta, \tau)\\
+\tau &= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}+ (\tau_0 - p \Delta \tau)\\
+\eta &= \sum_i \frac{r_i}{\sigma^2_{\text{tc}}}s_i^{\text{pref}}\\
 \end{aligned}
 \end{equation}
 
@@ -128,5 +134,11 @@ P(\mathbf{r}|C = 0) &= \frac{1}{1 + e^{-(\frac{1}{2} \log \frac{1 + \sigma_1^2 \
                     \log(P(Y=y^{(i)}|x^{(i)}, W,b)) \\
                 \ell (\theta=\{W,b\}, \mathcal{D})
 \end{equation}
+
+$P(C, s|\mathbf{r}) \approx Q(C|\mathbf{r}) Q(s|\mathbf{r})$\\
+\\
+$\log Q(C|\mathbf{r}) = \langle \log P(C, s|\mathbf{r}) \rangle_{Q(s|\mathbf{r})}$\\
+and\\
+$\log Q(s|\mathbf{r}) = \langle \log P(C, s|\mathbf{r}) \rangle_{Q(C|\mathbf{r})}$\\
 
 \end{document}
