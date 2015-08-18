@@ -7,6 +7,7 @@ import theano
 import theano.tensor as T
 import pystan
 import matplotlib.pyplot as plt
+import argparse
 
 nneuron = 61
 min_angle = -90
@@ -64,37 +65,6 @@ def generate_s_data(s_0, s_1):
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
-neurons_code = """
-data {
-    int<lower=0> N; // number of neurons
-    int r[N]; // neural response
-    real sprefs[N]; // preferred stimuli
-    real<lower=0> c_1;
-    real<lower=0> c_2;
-    int r_max;
-    //real c_rms;
-    //real c_50;
-    //real<lower=0> sig_tc;
-    real<lower=0> sigtc_sq;
-}
-parameters {
-    real s_1;
-    real s_2;
-}
-transformed parameters {
-    real lambda[N];
-    for (n in 1:N)
-        // lambda[n] <- r_max * ((c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)))/(c_rms + c_50));
-        // lambda[n] <- r_max * (c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)));
-        lambda[n] <- r_max * (c_1 * exp(- square(s_1 - sprefs[n])/(2 * sigtc_sq)) + c_2 * exp(- square(s_2 - sprefs[n])/(2 * sigtc_sq)));
-}
-model {
-    s_1 ~ uniform(-60, 60);
-    s_2 ~ uniform(-60, 60);
-    r ~ poisson(lambda);
-}
-"""
-
 def fit_optimal(r, init, sm, N=61, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_max=10, c_rms=0.707106781, sig_tc=10, sigtc_sq=10**2):
     neurons_dat = {'N': 61,
                    'r': r[0].astype(int),
@@ -108,9 +78,12 @@ def fit_optimal(r, init, sm, N=61, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_m
                    'sigtc_sq': sigtc_sq}
 
     optimal = np.zeros((2, ndata))
+    print init, "fo"
     for i in range(len(r)):
         neurons_dat['r'] = r[i].astype(int)
+        print init
         op = sm.optimizing(data=neurons_dat, init=init)
+        #op = sm.optimizing(data=neurons_dat)
         optimal[0][i], optimal[1][i] = op['s_1'], op['s_2']
         optimal = np.sort(optimal, axis=0)
     return optimal
@@ -446,17 +419,10 @@ def plot(nn, optimal, s_1, s_2):
     name = "{s_1}_{s_2}.pdf".format(s_1=s_1, s_2=s_2)
     fig.savefig(name)
 
-s_0 = -50
-s_1 = 15
-#Setting up models
-sm = pystan.StanModel(model_code=neurons_code)
-ntraindata = 20000
-train_data = generate_trainset(ntraindata)
-nn, nnx = train_nn(train_data, n_hidden=50, learning_rate=.001, n_epochs=100)
-
 def test_models(s_0, s_1, nn, nnx, sm):
-    init = {'s_1':s_0,
-            's_2':s_1}
+    init = {'s_1':int(s_0),
+            's_2':int(s_1)}
+    print init
     test_data = generate_s_data(s_0, s_1)
     print test_data
     nn_preds, _ = test_nn(nn, nnx, test_data)
@@ -465,6 +431,54 @@ def test_models(s_0, s_1, nn, nnx, sm):
     opt_preds = fit_optimal(r, init, sm)
     plot(nn_preds, opt_preds, s_0, s_1)
 
-test_models(s_0, s_1, nn, nnx, sm)
+import sys
+import getopt
+
+def main():
+    s1 = sys.argv[1]
+    s2 = sys.argv[2]
+
+    neurons_code = """
+    data {
+        int<lower=0> N; // number of neurons
+        int r[N]; // neural response
+        real sprefs[N]; // preferred stimuli
+        real<lower=0> c_1;
+        real<lower=0> c_2;
+        int r_max;
+        //real c_rms;
+        //real c_50;
+        //real<lower=0> sig_tc;
+        real<lower=0> sigtc_sq;
+    }
+    parameters {
+        real s_1;
+        real s_2;
+    }
+    transformed parameters {
+        real lambda[N];
+        for (n in 1:N)
+            // lambda[n] <- r_max * ((c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)))/(c_rms + c_50));
+            // lambda[n] <- r_max * (c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)));
+            lambda[n] <- r_max * (c_1 * exp(- square(s_1 - sprefs[n])/(2 * sigtc_sq)) + c_2 * exp(- square(s_2 - sprefs[n])/(2 * sigtc_sq)));
+    }
+    model {
+        s_1 ~ uniform(-60, 60);
+        s_2 ~ uniform(-60, 60);
+        r ~ poisson(lambda);
+    }
+    """
+
+
+    #Setting up models
+    sm = pystan.StanModel(model_code=neurons_code)
+    ntraindata = 20000
+    train_data = generate_trainset(ntraindata)
+    nn, nnx = train_nn(train_data, n_hidden=50, learning_rate=.001, n_epochs=100)
+
+    test_models(s1, s2, nn, nnx, sm)
+
+if __name__ == "__main__":
+    main()
 
 
