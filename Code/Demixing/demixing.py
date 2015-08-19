@@ -8,6 +8,7 @@ import theano.tensor as T
 import pystan
 import matplotlib.pyplot as plt
 import argparse
+import getopt
 
 nneuron = 61
 min_angle = -90
@@ -422,7 +423,7 @@ def test_nn(nn, nnx, test_data):
     print nn.get_params()
     return pred_ys, true_ys
 
-def plot(nn, optimal, s_1, s_2):
+def plot(nn, optimal, s_1, s_2, ntraindata):
     plt.rc('text', usetex=True)
     fig, ax = plt.subplots(1, 1)
     ax.scatter(nn[0], nn[1], c='b', label='Neural Net')
@@ -430,12 +431,12 @@ def plot(nn, optimal, s_1, s_2):
     ax.set_xlabel(r'\hat{s_1}',fontsize=16)
     ax.set_ylabel(r'\hat{s_2}',fontsize=16)
     ax.legend()
-    name = "{s_1}_{s_2}.pdf".format(s_1=s_1, s_2=s_2)
+    name = "{s_1}_{s_2}_{ntraindata}.pdf".format(s_1=s_1, s_2=s_2, ntraindata=ntraindata)
     fig.savefig(name)
 
 def test_models(s_0, s_1, nn, nnx, sm):
-    init = {'s_1':int(s_0),
-            's_2':int(s_1)}
+    init = {'s_1':s_0,
+            's_2':s_1}
     print init
     test_data = generate_s_data(s_0, s_1)
     print test_data
@@ -443,14 +444,15 @@ def test_models(s_0, s_1, nn, nnx, sm):
     nn_preds = nn_preds.T * 90
     r, s, c = test_data
     opt_preds = fit_optimal(r, init, sm)
-    plot(nn_preds, opt_preds, s_0, s_1)
-
-import sys
-import getopt
+    return nn_preds, opt_preds
 
 def main():
-    s1 = sys.argv[1]
-    s2 = sys.argv[2]
+    """
+    arguments: [smaller stimulus, larger stimulus, amount of training data]
+    """
+    s1 = int(sys.argv[1])
+    s2 = int(sys.argv[2])
+    ntraindata = int(sys.argv[3])
 
     neurons_code = """
     data {
@@ -486,11 +488,12 @@ def main():
 
     #Setting up models
     sm = pystan.StanModel(model_code=neurons_code)
-    ntraindata = 20000
+    #ntraindata = 20000
     train_data = generate_trainset(ntraindata)
     nn, nnx = train_nn(train_data, n_hidden=50, learning_rate=.001, n_epochs=100)
 
-    test_models(s1, s2, nn, nnx, sm)
+    nn_preds, opt_preds = test_models(s1, s2, nn, nnx, sm)
+    plot(nn_preds, opt_preds, s1, s2, ntraindata)
 
 if __name__ == "__main__":
     main()
