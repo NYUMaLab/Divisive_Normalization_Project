@@ -65,6 +65,20 @@ def generate_s_data(s_0, s_1):
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
+def fisher_inf(s_0, s_1, c_0, c_1):
+    fs_0 = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
+    qs_0 = r_max * contrast_0 * fs_0
+    df_s0 = ((-s_0 + sprefs)/sigtc_sq) * qs_0
+    fs_1 = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
+    qs_1 = r_max * contrast_1 * fs_1
+    df_s1 = ((-s_1 + sprefs)/sigtc_sq) * qs_1
+    Q = qs_0 + qs_1
+    Q_inv = 1/Q
+    J_11 = np.sum(np.square(df_s0) * Q_inv)
+    J_22 = np.sum(np.square(df_s1) * Q_inv)
+    J_12 = J_21 = np.sum(df_s0 * df_s1 * Q_inv)
+    return J_11, J_22, J_12, J_21
+
 def fit_optimal(r, init, sm, N=61, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_max=10, c_rms=0.707106781, sig_tc=10, sigtc_sq=10**2):
     neurons_dat = {'N': 61,
                    'r': r[0].astype(int),
