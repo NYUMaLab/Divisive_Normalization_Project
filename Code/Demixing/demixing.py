@@ -57,12 +57,12 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, noise, sort, s_
         r = np.random.poisson(r) + 0.0
     return r, s, c
 
-def generate_s_data(s_0, s_1):
+def generate_s_data(stim_0, stim_1):
     ndata = 3000
     c_0, c_1 = np.ones((2, ndata)) * .5
     s_0, s_1 = np.ones((2, ndata))
-    s_0 = s_0 * -50
-    s_1 = s_1 * 15
+    s_0 = s_0 * stim_0
+    s_1 = s_1 * stim_1
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
