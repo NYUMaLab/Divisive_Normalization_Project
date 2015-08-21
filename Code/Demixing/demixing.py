@@ -3,8 +3,8 @@ import math
 import os
 import sys
 import time
-import theano
-import theano.tensor as T
+#import theano
+#import theano.tensor as T
 import pystan
 import matplotlib.pyplot as plt
 import argparse
@@ -489,11 +489,13 @@ def main():
     #Setting up models
     sm = pystan.StanModel(model_code=neurons_code)
     #ntraindata = 20000
+    """
     train_data = generate_trainset(ntraindata)
     nn, nnx = train_nn(train_data, n_hidden=50, learning_rate=.001, n_epochs=100)
 
     nn_preds, opt_preds = test_models(s1, s2, nn, nnx, sm)
     plot(nn_preds, opt_preds, s1, s2, ntraindata)
+    """
 
 if __name__ == "__main__":
     main()
