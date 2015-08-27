@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  5 JUN 2015 18:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  26 AUG 2015 15:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -492,7 +492,7 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
 LaTeX Info: Redefining \[ on input line 2665.
 LaTeX Info: Redefining \] on input line 2666.
 )
-(./Variational-Categorization.aux)
+No file Variational-Categorization.aux.
 \openout1 = `Variational-Categorization.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 5.
@@ -507,7 +507,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
 LaTeX Font Info:    ... okay on input line 5.
- ABD: EveryShipout initializing macros
+ABD: EveryShipout initializing macros
 (/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count119
@@ -605,8 +605,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 138--143
 
 [5] (./Variational-Categorization.aux) ) 
 Here is how much of TeX's memory you used:
- 14437 strings out of 493117
- 311458 string characters out of 6135433
+ 14435 strings out of 493117
+ 311396 string characters out of 6135433
  376898 words of memory out of 5000000
  17620 multiletter control sequences out of 15000+600000
  10570 words of font info for 38 fonts, out of 8000000 for 9000
