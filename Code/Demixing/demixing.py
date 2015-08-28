@@ -3,12 +3,11 @@ import math
 import os
 import sys
 import time
-#import theano
-#import theano.tensor as T
+import theano
+import theano.tensor as T
 import pystan
 import matplotlib.pyplot as plt
 import argparse
-import getopt
 
 nneuron = 61
 min_angle = -90
@@ -27,7 +26,7 @@ def random_s(ndata, sort):
         s = np.sort(s, axis=0)
     return s[0], s[1]
 
-def generate_trainset(ndata):
+def generate_trainset(ndata, r_max=10):
     s_0, s_1 = random_s(ndata, True)
     c_0, c_1 = np.ones((2, ndata)) * .5
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
@@ -57,8 +56,7 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, noise, sort, s_
         r = np.random.poisson(r) + 0.0
     return r, s, c
 
-def generate_s_data(stim_0, stim_1):
-    ndata = 3000
+def generate_s_data(stim_0, stim_1, ndata):
     c_0, c_1 = np.ones((2, ndata)) * .5
     s_0, s_1 = np.ones((2, ndata))
     s_0 = s_0 * stim_0
@@ -68,19 +66,20 @@ def generate_s_data(stim_0, stim_1):
 
 def fisher_inf(s_0, s_1, c_0, c_1):
     fs_0 = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
-    qs_0 = r_max * contrast_0 * fs_0
+    qs_0 = r_max * c_0 * fs_0
     df_s0 = ((-s_0 + sprefs)/sigtc_sq) * qs_0
     fs_1 = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
-    qs_1 = r_max * contrast_1 * fs_1
+    qs_1 = r_max * c_1 * fs_1
     df_s1 = ((-s_1 + sprefs)/sigtc_sq) * qs_1
     Q = qs_0 + qs_1
     Q_inv = 1/Q
     J_11 = np.sum(np.square(df_s0) * Q_inv)
     J_22 = np.sum(np.square(df_s1) * Q_inv)
     J_12 = J_21 = np.sum(df_s0 * df_s1 * Q_inv)
-    return J_11, J_22, J_12, J_21
+    fisher = np.linalg.inv([[J_11, J_12], [J_21, J_22]])
+    return fisher
 
-def fit_optimal(r, init, sm, N=61, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_max=10, c_rms=0.707106781, sig_tc=10, sigtc_sq=10**2):
+def fit_optimal(r, sm, N=61, init=None, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_max=10, c_rms=0.707106781, sig_tc=10, sigtc_sq=10**2):
     neurons_dat = {'N': 61,
                    'r': r[0].astype(int),
                    'sprefs': sprefs,
@@ -93,12 +92,13 @@ def fit_optimal(r, init, sm, N=61, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_m
                    'sigtc_sq': sigtc_sq}
 
     optimal = np.zeros((2, ndata))
-    print init, "fo"
+    print init
     for i in range(len(r)):
         neurons_dat['r'] = r[i].astype(int)
-        print init
-        op = sm.optimizing(data=neurons_dat, init=init)
-        #op = sm.optimizing(data=neurons_dat)
+        if not init:
+            op = sm.optimizing(data=neurons_dat)
+        else:     
+            op = sm.optimizing(data=neurons_dat, init=init)
         optimal[0][i], optimal[1][i] = op['s_1'], op['s_2']
         optimal = np.sort(optimal, axis=0)
     return optimal
@@ -326,8 +326,6 @@ def train_nn(dataset, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=2
     # compute number of minibatches for training, validation and testing
     n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
     
-    test_batch_size = 1
-    
     ######################
     # BUILD ACTUAL MODEL #
     ######################
@@ -418,12 +416,24 @@ def test_nn(nn, nnx, test_data):
     for i in range(len(true_ys)):
         pred_ys[i] = test_model(i)
         #print test_model(i)[0], true_ys[i]
-        print test_model(i)[0] * 90, true_ys[i]
+        #print test_model(i)[0] * 90, true_ys[i]
     
-    print nn.get_params()
+    #print nn.get_params()
     return pred_ys, true_ys
 
-def plot(nn, optimal, s_1, s_2, ntraindata):
+def test_models(s_0, s_1, nn, nnx, sm):
+    init = {'s_1':s_0,
+            's_2':s_1}
+    test_data = generate_s_data(s_0, s_1, 3000)
+    #print test_data
+    nn_preds, _ = test_nn(nn, nnx, test_data)
+    nn_preds = nn_preds.T * 90
+    r, s, c = test_data
+    opt_preds = fit_optimal(r, sm)
+    #opt_preds = fit_optimal(r, sm, init=init)
+    return nn_preds, opt_preds
+
+def plot_trials(nn, optimal, s_1, s_2, ntraindata):
     plt.rc('text', usetex=True)
     fig, ax = plt.subplots(1, 1)
     ax.scatter(nn[0], nn[1], c='b', label='Neural Net')
@@ -432,19 +442,71 @@ def plot(nn, optimal, s_1, s_2, ntraindata):
     ax.set_ylabel(r'\hat{s_2}',fontsize=16)
     ax.legend()
     name = "{s_1}_{s_2}_{ntraindata}.pdf".format(s_1=s_1, s_2=s_2, ntraindata=ntraindata)
+    #plt.show()
     fig.savefig(name)
 
-def test_models(s_0, s_1, nn, nnx, sm):
-    init = {'s_1':s_0,
-            's_2':s_1}
-    print init
-    test_data = generate_s_data(s_0, s_1)
-    print test_data
-    nn_preds, _ = test_nn(nn, nnx, test_data)
-    nn_preds = nn_preds.T * 90
-    r, s, c = test_data
-    opt_preds = fit_optimal(r, init, sm)
-    return nn_preds, opt_preds
+def get_contours(nn, optimal):
+    nn1 = nn[0]
+    nn2 = nn[1]
+    opt1 = optimal[0]
+    opt2 = optimal[1]
+    xmin = nn1.min()
+    xmax = nn1.max()
+    ymin = nn2.min()
+    ymax = nn2.max()
+    X, Y = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+    positions = np.vstack([X.ravel(), Y.ravel()])
+    values_nn = np.vstack([nn1, nn2])
+    kernel_nn = stats.gaussian_kde(values_nn)
+    Z_nn = np.reshape(kernel_nn(positions).T, X.shape)
+    values_opt = np.vstack([opt1, opt2])
+    kernel_opt = stats.gaussian_kde(values_opt)
+    Z_opt = np.reshape(kernel_opt(positions).T, X.shape)
+    """
+    plt.contour(X, Y, Z_nn, colors='b')
+    plt.contour(X, Y, Z_opt, colors='r')
+    """
+    return X, Y, Z_nn, Z_opt
+
+def test_combs(s_arr):
+    l_sarr = len(s_arr)
+    nn = [[None] * l_sarr for k in range(l_sarr)]
+    opt = [[None] * l_sarr for k in range(l_sarr)]
+    for i in range(l_sarr):
+        for j in range(i+1, l_sarr):
+            s1 = s_arr[i]
+            s2 = s_arr[j]
+            nn[i][j], opt[i][j] = test_models(s1, s2, nn2, nnx2, sm)
+    return nn, opt
+
+def plot_contours(nn, opt):
+    axes().set_aspect('equal')
+    plt.xlim(-60, 60)
+    plt.ylim(-60, 60)
+    plt.figure(figsize=(10,10))
+    axes().set_xlabel(r'\hat{s_1}',fontsize=16)
+    axes().set_ylabel(r'\hat{s_2}',fontsize=16)
+    for i in range(l_sarr):
+        for j in range(i+1, l_sarr):
+            X, Y, Z_nn, Z_opt = get_contours(nn[i][j], opt[i][j])
+            plt.contour(X, Y, Z_nn, colors='b', levels=[0.003])
+            plt.contour(X, Y, Z_opt, colors='r', levels=[0.003])
+            #plt.scatter(nn[i][j][0], nn[i][j][1], c='g', label='Neural Net')
+            #plt.scatter(opt[i][j][0], opt[i][j][1], c='y', label='MLE')
+    fig.savefig("stimplot.pdf")
+
+def get_statistics(s1, s2, preds):
+    mean_s1 = np.mean(preds[0])
+    mean_s2 = np.mean(preds[1])
+    bias_s1 = mean_s1 - s1
+    bias_s2 = mean_s2 - s2
+    covmat = np.cov(preds)
+    var_s1 = covmat[0, 0]
+    var_s2 = covmat[1, 1]
+    cov = covmat[0, 1]
+    corr = cov / (np.sqrt(var_s1) * np.sqrt(var_s2))
+    stats = {'mean_s1': mean_s1, 'mean_s2': mean_s2, 'bias_s1': bias_s1, 'bias_s2': bias_s2, 'var_s1': var_s1, 'var_s2': var_s2, 'cov': cov, 'corr': corr}
+    return stats
 
 def main():
     """
@@ -470,6 +532,7 @@ def main():
     parameters {
         real s_1;
         real s_2;
+        //real<lower=s_1> s_2;
     }
     transformed parameters {
         real lambda[N];
@@ -481,6 +544,7 @@ def main():
     model {
         s_1 ~ uniform(-60, 60);
         s_2 ~ uniform(-60, 60);
+        //s_2 ~ uniform(s_1, 60);
         r ~ poisson(lambda);
     }
     """
@@ -488,14 +552,12 @@ def main():
 
     #Setting up models
     sm = pystan.StanModel(model_code=neurons_code)
-    #ntraindata = 20000
-    """
+    ntraindata = 20000
     train_data = generate_trainset(ntraindata)
-    nn, nnx = train_nn(train_data, n_hidden=50, learning_rate=.001, n_epochs=100)
+    nn, nnx = train_nn(train_data, n_hidden=20, learning_rate=.001, n_epochs=100)
 
     nn_preds, opt_preds = test_models(s1, s2, nn, nnx, sm)
-    plot(nn_preds, opt_preds, s1, s2, ntraindata)
-    """
+    plot_trials(nn_preds, opt_preds, s1, s2, ntraindata)
 
 if __name__ == "__main__":
     main()
