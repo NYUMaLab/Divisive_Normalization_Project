@@ -20,9 +20,34 @@
 
 \end{tikzpicture}
 \\
-$s_j$ is stimulus j\\
-$c_j$ is contrast of grating j\\
-$r_i$ is response of neuron i\\
+$s_j$ is stimulus j (here drawn from uniform distribution)\\
+$c_j$ is contrast of grating j (here held constant at .5)\\
+$N_{ij}$ is the response of neuron i to grating j\\ 
+(Poisson neurons with Gaussian tuning curves)\\
+$r_i$ is response of neuron i ($\sum_j N_{ij}$)\\
+\\
+
+\begin{tikzpicture}
+
+  % Define nodes
+  \node[latent]  (s1) {$s_1$};
+  \node[latent, below=of s1]        (N1) {$\mathbf{N_1}$};
+  \node[latent, right=of s1]  (s2) {$s_2$};
+  \node[latent, below=of s2]        (N2) {$\mathbf{N_2}$};
+  \node[obs, below=of N1]                               (r) {$\mathbf{r}$};
+  % Connect the nodes
+  \edge {s1} {N1} ;
+  \edge {s2} {N2} ;
+  \edge {N1} {r} ; 
+  \edge {N2} {r} ; 
+
+\end{tikzpicture}
+\\
+\\
+
+$\hat{\mathbf{s}} = \arg\max_\mathbf{s} p(\mathbf{r|s}) p(\mathbf{s})$
+\\
+\\
 $f_i(s)$ is tuning curve of neuron i\\
 Tuning curve assumptions:\\
 Tuning curves cover the space so $\sum_i f_i(s_j)$ is independent of $s_j$\\
