@@ -17,6 +17,7 @@ min_angle = -90
 max_angle = 90
 sprefs = np.linspace(min_angle, max_angle, nneuron)
 eps = np.finfo(np.float64).eps
+np.random.seed(1234)
 
 r_max = 10
 sigtc_sq = float(10**2)
@@ -470,13 +471,24 @@ def test_nn(nn, nnx, test_data):
     #print nn.get_params()
     return pred_ys, true_ys
 
-train_data_1 = generate_trainset(500000)
-valid_data_1 = generate_trainset(3000)
-#nn_rms, nnx_rms, valid_mse_rms = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.0001, n_epochs=100, rho=.9)
-#nn_rms, nnx_rms, valid_mse_rms = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.0001, n_epochs=100, rho=.95)
-#nn_rms, nnx_rms, valid_mse_rms = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.0001, n_epochs=100, rho=.99)
-#nn_rms_m9, nnx_rms_m9, valid_mse_rms_m9 = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.001, n_epochs=100, rho=.99, nesterov=True, momentum=0.9)
-#nn_rms_m9f, nnx_rms_m9f, valid_mse_rms_m9f = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.001, n_epochs=100, rho=.99, nesterov=False, momentum=0.9)
-#nn_rms_m95, nnx_rms_m95, valid_mse_rms_m95 = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.001, n_epochs=100, rho=.99, momentum=0.95)
-nn_rms_m99, nnx_rms_m99, valid_mse_rms_m99 = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.0001, n_epochs=100, rho=.99, momentum=0.99)
-#nn_plain, nnx_plain, valid_mse_plain = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=.001, n_epochs=100)
+def main():
+	index = int(sys.argv[1])
+
+	rhos = np.linspace(.9, .999, 20)
+	moms = np.linspace(.9, .999, 20)
+	lrs = np.linspace(.00001, .1, 20)
+	params = list(product(rhos, moms, lrs))
+
+	rho = params[index][0]
+	mom = params[index][1]
+	lr = params[index][2]
+
+    train_data_1 = generate_trainset(500000)
+	valid_data_1 = generate_testset(3000)
+    nn, nnx, valid_mse = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=lr, n_epochs=100, rho=rho, momentum=mom)
+
+    print valid_mse[99]
+if __name__ == "__main__":
+    main()
+
+
