@@ -482,10 +482,10 @@ def main():
 	rho = params[index][0]
 	mom = params[index][1]
 	lr = params[index][2]
-
-    train_data_1 = generate_trainset(500000)
+	
+	train_data_1 = generate_trainset(500000)
 	valid_data_1 = generate_testset(3000)
-    nn, nnx, valid_mse = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=lr, n_epochs=100, rho=rho, momentum=mom)
+	nn, nnx, valid_mse = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=lr, n_epochs=100, rho=rho, momentum=mom)
 
     print valid_mse[99]
 if __name__ == "__main__":

@@ -1,15 +1,20 @@
-#!/bin/bash
-#PBS -l nodes=1:ppn=4
-#PBS -l walltime=2:00:00
-#PBS -l mem=2GB
-#PBS -N python
-#PBS -M david.halpern@nyu.edu
-#PBS -j oe
-#PBS -t 1-8000
- 
+#!/bin/bash                                                                     
+#PBS -l nodes=1:ppn=4                                                           
+#PBS -l walltime=2:00:00                                                        
+#PBS -l mem=2GB                                                                 
+#PBS -N python                                                                  
+#PBS -M david.halpern@nyu.edu                                                   
+#PBS -j oe                                                                      
+
 module purge
-module load python
+module load theano
 
-python demixing_gains.py $index
+RUNDIR=$SCRATCH/demixing
+mkdir -p $RUNDIR
+cp $HOME/Divisive_Normalization_Project/Code/Demixing/* $RUNDIR
 
-echo "Done"
+cd $RUNDIR
+for i in {1..60} ; do
+   echo $i
+   python demixing_gains.py $i
+done
