@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import poisson
 import matplotlib.patches as mpatches
 from functools import partial
+import pandas as pd
 import pickle
 
 nneuron = 61
@@ -97,8 +98,10 @@ def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_
         c_0, c_1 = np.concatenate((np.ones((2, ndata/2)) * low, np.ones((2, ndata/2)) * high), axis=1)
     elif discrete_c:
         cs = np.linspace(low, high, discrete_c)
-        perm_cs = cartesian((cs, cs)).T
-        c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
+        perm_cs = cartesian((cs, cs))
+        c_arr = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0)
+        np.random.shuffle(c_arr)
+        c_0, c_1 = c_arr.T
         print ndata/(discrete_c**2), "trials per contrast level"
         if ndata%(discrete_c**2) != 0:
             print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
@@ -116,8 +119,8 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
         c_range = high - low
         if discrete_c:
             cs = np.linspace(low, high, discrete_c)
-            perm_cs = cartesian((cs, cs)).T
-            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
+            perm_cs = cartesian((cs, cs))
+            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0).T
             print ndata/(discrete_c**2), "trials per contrast level"
             if ndata%(discrete_c**2) != 0:
                 print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
@@ -160,7 +163,7 @@ def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, noi
     c = np.array((c_0, c_1)).T
     if noise == "poisson":
         r = np.random.poisson(r) + 0.0
-    return r, numvec, s, c
+    return r, numvec, s, c 
 
 def lik_means(s_1, s_2, c_0=.5, c_1=.5, sprefs=sprefs, sigtc_sq=sigtc_sq, r_max=10):
     sprefs_data = np.tile(sprefs, (len(s_1), 1))
@@ -254,107 +257,3 @@ for i in xrange(len(r_max_arr)):
 pkl_file = open('stats.pkl', 'wb')
 pickle.dump(all_stats, pkl_file)
 pkl_file.close()
-
-def random_s(ndata, sort):
-    s = np.random.rand(2, ndata) * 120 - 60
-    if sort:
-        s = np.sort(s, axis=0)
-    return s[0], s[1]
-
-def random_c(ndata, ndims, low, high, sort):
-    c_range = high - low
-    if ndims == 1:
-        c = np.random.rand(ndims, ndata)[0] * c_range + low
-    else:
-        c = np.random.rand(ndims, ndata) * c_range + low
-    if sort:
-        c = np.sort(c, axis=0)
-    return c
-    
-def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1, c_0, c_1, c_50=13.1):
-    c_rms = np.sqrt(np.square(c_0) + np.square(c_1))
-    sprefs_data = np.tile(sprefs, (ndata, 1))
-    s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_0 = c_0 * s_0t.T
-    s_1t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_1 = c_1 * s_1t.T
-    #r = r_max * (stim_0 + stim_1)/(c_50 + c_rms)
-    r = r_max * (stim_0 + stim_1)
-    r = r.T
-    s = np.array((s_0, s_1)).T
-    s = s/90
-    c = np.array((c_0, c_1)).T
-    if noise == "poisson":
-        r = np.random.poisson(r) + 0.0
-    return r, s, c
-
-def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
-    s_0, s_1 = random_s(ndata, True)
-    if highlow:
-        c_0, c_1 = np.concatenate((np.ones((2, ndata/2)) * low, np.ones((2, ndata/2)) * high), axis=1)
-    elif discrete_c:
-        cs = np.linspace(low, high, discrete_c)
-        perm_cs = cartesian((cs, cs)).T
-        c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
-        print ndata/(discrete_c**2), "trials per contrast level"
-        if ndata%(discrete_c**2) != 0:
-            print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-        ndata = ndata / (discrete_c**2) * (discrete_c**2)
-    else:
-        c_0, c_1 = np.ones((2, ndata)) * .5
-    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
-    return r, s, c
-
-def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, discrete_c=None, low=.5, high=.5, r_max=10):
-    if con_0:
-        c_0 = np.ones(ndata) * con_0
-        c_1 = np.ones(ndata) * con_1
-    else:
-        c_range = high - low
-        if discrete_c:
-            cs = np.linspace(low, high, discrete_c)
-            perm_cs = cartesian((cs, cs)).T
-            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
-            print ndata/(discrete_c**2), "trials per contrast level"
-            if ndata%(discrete_c**2) != 0:
-                print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-            ndata = ndata / (discrete_c**2) * (discrete_c**2)
-        else:
-            c_0, c_1 = np.random.rand(2, ndata) * c_range + low
-    if not stim_0:
-        s_0, s_1 = random_s(ndata, True)
-    else:
-        s_0, s_1 = np.ones((2, ndata))
-        s_0 = s_0 * stim_0
-        s_1 = s_1 * stim_1
-    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
-    return r, s, c
-
-def generate_trainset_cat(ndata, low=.3, high=1.3, crange=.5, r_max=10):
-    numvec = np.random.binomial(1, .5, size=ndata).astype(int)
-    c_0 = random_c(ndata, 1, high, high+crange, True)
-    c_1 = random_c(ndata, 1, low, low+crange, True)
-    s_0, s_1 = np.random.rand(2, ndata) * 120 - 60
-    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, "poisson", s_0, s_1, c_0, c_1)
-    y = s[range(ndata), numvec]
-    return r, y, s, c, numvec 
-    
-def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, noise, s_0, s_1, c_0, c_1):
-    c0vec = c_0 * np.ones(ndata)
-    c1vec = c_1 * numvec
-    c_rms = np.sqrt(np.square(c0vec) + np.square(c1vec))
-    sprefs_data = np.tile(sprefs, (ndata, 1))
-    s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_0 = c0vec * s_0t.T
-    s_1t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_1 = c1vec * s_1t.T
-    #r = r_max * (stim_0 + stim_1)/(c_50 + c_rms)
-    r = r_max * (stim_0 + stim_1)/(c_rms)
-    #r = r_max * (stim_0 + stim_1)
-    r = r.T
-    s = np.array((s_0, s_1)).T
-    s = s/90
-    c = np.array((c_0, c_1)).T
-    if noise == "poisson":
-        r = np.random.poisson(r) + 0.0
-    return r, numvec, s, c

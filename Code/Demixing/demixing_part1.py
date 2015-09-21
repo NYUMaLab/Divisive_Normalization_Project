@@ -92,14 +92,49 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1
         r = np.random.poisson(r) + 0.0
     return r, s, c
 
+def random_s(ndata, sort):
+    s = np.random.rand(2, ndata) * 120 - 60
+    if sort:
+        s = np.sort(s, axis=0)
+    return s[0], s[1]
+
+def random_c(ndata, ndims, low, high, sort):
+    c_range = high - low
+    if ndims == 1:
+        c = np.random.rand(ndims, ndata)[0] * c_range + low
+    else:
+        c = np.random.rand(ndims, ndata) * c_range + low
+    if sort:
+        c = np.sort(c, axis=0)
+    return c
+    
+def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1, c_0, c_1, c_50=13.1):
+    c_rms = np.sqrt(np.square(c_0) + np.square(c_1))
+    sprefs_data = np.tile(sprefs, (ndata, 1))
+    s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_0 = c_0 * s_0t.T
+    s_1t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_1 = c_1 * s_1t.T
+    #r = r_max * (stim_0 + stim_1)/(c_50 + c_rms)
+    r = r_max * (stim_0 + stim_1)
+    r = r.T
+    s = np.array((s_0, s_1)).T
+    s = s/90
+    c = np.array((c_0, c_1)).T
+    if noise == "poisson":
+        r = np.random.poisson(r) + 0.0
+    return r, s, c
+
 def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
     s_0, s_1 = random_s(ndata, True)
     if highlow:
         c_0, c_1 = np.concatenate((np.ones((2, ndata/2)) * low, np.ones((2, ndata/2)) * high), axis=1)
     elif discrete_c:
         cs = np.linspace(low, high, discrete_c)
-        perm_cs = cartesian((cs, cs)).T
-        c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
+        perm_cs = cartesian((cs, cs))
+        c_arr = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0)
+        np.random.shuffle(c_arr)
+        c_0, c_1 = c_arr.T
         print ndata/(discrete_c**2), "trials per contrast level"
         if ndata%(discrete_c**2) != 0:
             print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
@@ -117,8 +152,8 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
         c_range = high - low
         if discrete_c:
             cs = np.linspace(low, high, discrete_c)
-            perm_cs = cartesian((cs, cs)).T
-            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=1)
+            perm_cs = cartesian((cs, cs))
+            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0).T
             print ndata/(discrete_c**2), "trials per contrast level"
             if ndata%(discrete_c**2) != 0:
                 print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
@@ -582,24 +617,31 @@ def test_nn(nn, nnx, test_data):
     #print nn.get_params()
     return pred_ys, true_ys
 
-train_data_1 = generate_testset(19998, discrete_c=3, low=.3, high=.7)
-valid_data_1 = generate_testset(297, discrete_c=3, low=.3, high=.7)
+train_data = {}
+td_sizes = [2700, 27000, 270000]
+td_types = [True, False]
+for td_s in td_sizes:
+    for td_t in td_types:
+        train_data[td_s, td_t] = generate_trainset(td_s, highlow=td_t, discrete_c=3, low=.3, high=.7)
+valid_data = generate_testset(900, discrete_c=3, low=.3, high=.7)
 lrs = [.01, .005, .001, .0005, .0001, .00001]
 rhos = [0, .75, .9, .95, .99, .999]
 mus = [0, .75, .9, .95, .99, .999]
 nests = [True, False]
-nrows = len(lrs) * len(rhos) * len(mus) * len(nests)
-nn_df = pd.DataFrame(index=np.arange(0, nrows), columns=('lr', 'rho', 'mu', 'nest', 'valid_nn') )
+nrows = len(td_sizes) * len(td_types) * len(lrs) * len(rhos) * len(mus) * len(nests)
+nn_df = pd.DataFrame(index=np.arange(0, nrows), columns=('training_type', 'training_size', 'lr', 'rho', 'mu', 'nest', 'valid_nn') )
 nns = {}
 ind = 0
-for lr in lrs:
-    for rho in rhos:
-        for mu in mus:
-            for n in nests:
-                nn, nnx, valid_nn = train_nn(train_data_1, valid_dataset=valid_data_1, n_hidden=20, learning_rate=lr, n_epochs=100, rho=rho, mu=mu, nesterov=n)
-                nn_df.loc[ind] = [lr, rho, mu, n, valid_nn[99]]
-                nns[lr, rho, mu, n] = nn, nnx, valid_nn
-                ind += 1
+for td_s in td_sizes:
+    for td_t in td_types:
+        for lr in lrs:
+            for rho in rhos:
+                for mu in mus:
+                    for n in nests:
+                        nn, nnx, valid_nn = train_nn(train_data[td_s, td_t], valid_dataset=valid_data, n_hidden=20, learning_rate=lr, n_epochs=100, rho=rho, mu=mu, nesterov=n)
+                        nn_df.loc[ind] = [td_s, td_t, lr, rho, mu, n, valid_nn[99]]
+                        nns[td_s, td_t, lr, rho, mu, n] = nn, nnx, valid_nn
+                        ind += 1
                 
 nn_optim = (nn_df, nns)
 pkl_file = open('nn_optim.pkl', 'wb')
