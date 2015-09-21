@@ -588,10 +588,6 @@ lrs = [.01, .005, .001, .0005, .0001, .00001]
 rhos = [0, .75, .9, .95, .99, .999]
 mus = [0, .75, .9, .95, .99, .999]
 nests = [True, False]
-lrs = [.01]
-rhos = [0]
-mus = [0]
-nests = [True]
 nrows = len(lrs) * len(rhos) * len(mus) * len(nests)
 nn_df = pd.DataFrame(index=np.arange(0, nrows), columns=('lr', 'rho', 'mu', 'nest', 'valid_nn') )
 nns = {}
