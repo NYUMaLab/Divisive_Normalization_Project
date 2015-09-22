@@ -233,15 +233,19 @@ for i in xrange(len(r_max_arr)):
                   'var_s1': np.zeros((num_deltas, discrete_c**2)), 
                   'var_s2': np.zeros((num_deltas, discrete_c**2)), 
                   'cov': np.zeros((num_deltas, discrete_c**2)), 
-                  'corr': np.zeros((num_deltas, discrete_c**2))}
+                  'corr': np.zeros((num_deltas, discrete_c**2)),
+                  'posts': {}
+                 }
 
     for delta_s in range(num_deltas):
         test_data = generate_testset(ndata, stim_0=s1, stim_1=s1+delta_s, discrete_c=discrete_c, low=.3, high=.7, r_max=r_max_arr[i])
         r, _, _ = test_data
         posts = get_posteriors(r, post_func)
         post_means = np.array((posts['mean_s1'], posts['mean_s2']))
+        post_stats['posts'][delta_s] = posts
         for c in range(discrete_c**2):
             post_means_c = post_means.T[(ndata_per_c*c):(ndata_per_c*(c+1))]
+            post_means_c = post_means_c.T
             stats = get_statistics(s1, s1 + delta_s, post_means_c)
 
             post_stats['mean_s1'][delta_s][c] = stats['mean_s1']
