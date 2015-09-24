@@ -233,7 +233,7 @@ def main():
     delta_s = s_i / 3
     i = s_i % 3
     c_arr = [1, 2, 4]
-    c = c[i]
+    c = c_arr[i]
 
     s1=-30
     post_func = posterior_setup(low=c, high=c, discrete_c=1, num_s=60, r_max=1)
