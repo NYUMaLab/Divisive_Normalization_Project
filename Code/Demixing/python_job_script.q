@@ -1,12 +1,11 @@
 #!/bin/bash                                                                                                                                                                                                                                                                                                                        
 #PBS -l nodes=1:ppn=4                                                                                                                                                                                                                                                                                                              
-#PBS -l walltime=2:00:00                                                                                                                                                                                                                                                                                                           
+#PBS -l walltime=5:00:00                                                                                                                                                                                                                                                                                                           
 #PBS -l mem=2GB                                                                                                                                                                                                                                                                                                                    
 #PBS -N python                                                                                                                                                                                                                                                                                                                    
 #PBS -M david.halpern@nyu.edu                                                                                                                                                                                                                                                                                             
 #PBS -j oe                                                                                                                                                                                                                                                                                                                        
-#PBS -lfeature=ivybridge                                                                                                                                                                                                                                                                                                          
-#PBS -t 1-80                                                                                                                                                     
+#PBS -lfeature=ivybridge                                                                                                                                                                                                                                                                                                                                                                                                                                                             
                                                                                                                                                                   
 index=${PBS_ARRAYID}
 job=${PBS_JOBID}
@@ -21,7 +20,6 @@ RUNDIR=$HOME/Divisive_Normalization_Project/Code/Demixing/
 cd $RUNDIR
 rm -rf ~/.theano
 
-echo $index
-THEANO_FLAGS="base_compiledir=$RUNDIR/compiledir/$index/ " python demixing_gains.py $index
+THEANO_FLAGS="base_compiledir=$RUNDIR/compiledir/$index/ " python demixing_part0b.py 0
 
 echo "Done"
