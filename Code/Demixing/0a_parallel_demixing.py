@@ -240,7 +240,7 @@ def main():
     test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
     r, _, _ = test_data
     posts = get_posteriors_pool(r, post_func)
-    output = (posts, r, c, i)
+    output = (posts, r, c, delta_s)
 
     file_name = "post_" + str(s_i) + ".pkl"
 
