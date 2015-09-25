@@ -604,7 +604,7 @@ def main():
 
     train_data = generate_trainset(270000, discrete_c=1, low=c, high=c, r_max=1)
     valid_data = generate_testset(900, discrete_c=1, low=c, high=c, r_max=1)
-    nn = train_nn(train_data, valid_dataset=valid_data, n_hidden=100, learning_rate=lr, n_epochs=100, rho=rho, mu=mu, nesterov=n)
+    nn = train_nn(train_data, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
 
     nn_stats = {'mean_s1': np.zeros(num_deltas), 
                 'mean_s2': np.zeros(num_deltas), 
