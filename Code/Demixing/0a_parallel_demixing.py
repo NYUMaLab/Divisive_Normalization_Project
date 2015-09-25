@@ -239,12 +239,12 @@ def main():
     post_func = posterior_setup(low=c, high=c, discrete_c=1, num_s=60, r_max=1)
     test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
     r, _, _ = test_data
-    get_posteriors_pool(r, post_func)
+    posts = get_posteriors_pool(r, post_func)
 
     file_name = "post_" + str(i) + ".pkl"
 
     pkl_file = open(file_name, 'wb')
-    pickle.dump(results, pkl_file)
+    pickle.dump(posts, pkl_file)
     pkl_file.close()
 
 if __name__ == "__main__":
