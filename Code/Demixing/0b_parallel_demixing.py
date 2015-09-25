@@ -596,6 +596,20 @@ def main():
     pkl_file.close()
 """
 
+def get_statistics(s1, s2, preds):
+    mean_s1 = np.mean(preds[0])
+    mean_s2 = np.mean(preds[1])
+    bias_s1 = mean_s1 - s1
+    bias_s2 = mean_s2 - s2
+    mse = np.mean((preds[0] - s1)**2 + (preds[1] - s2)**2)
+    covmat = np.cov(preds)
+    var_s1 = covmat[0, 0]
+    var_s2 = covmat[1, 1]
+    cov = covmat[0, 1]
+    corr = cov / (np.sqrt(var_s1) * np.sqrt(var_s2))
+    stats = {'mean_s1': mean_s1, 'mean_s2': mean_s2, 'bias_s1': bias_s1, 'bias_s2': bias_s2, 'var_s1': var_s1, 'var_s2': var_s2, 'cov': cov, 'corr': corr, 'mse': mse}
+    return stats
+
 def main():
     i = int(sys.argv[1])
 
@@ -604,8 +618,10 @@ def main():
 
     train_data = generate_trainset(270000, discrete_c=1, low=c, high=c, r_max=1)
     valid_data = generate_testset(900, discrete_c=1, low=c, high=c, r_max=1)
-    nn = train_nn(train_data, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
+    nn, nnx, valid_mse = train_nn(train_data, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
 
+    num_deltas = 30
+    s1 = -30
     nn_stats = {'mean_s1': np.zeros(num_deltas), 
                 'mean_s2': np.zeros(num_deltas), 
                 'bias_s1': np.zeros(num_deltas), 
@@ -617,8 +633,6 @@ def main():
                 'mse': np.zeros(num_deltas),
                 }
 
-    num_deltas = 30
-    
     for delta_s in range(num_deltas):
         test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
         nn_preds, _ = test_nn(nn, nnx, test_data)
@@ -636,7 +650,7 @@ def main():
 
     file_name = "nn_runs" + str(i) + ".pkl"
 
-    out = (nn, nn_stats, c)
+    out = (nn, nnx, valid_mse, nn_stats, c)
 
     pkl_file = open(file_name, 'wb')
     pickle.dump(out, pkl_file)
