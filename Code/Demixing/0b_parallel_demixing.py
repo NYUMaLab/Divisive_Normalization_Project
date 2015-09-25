@@ -599,7 +599,7 @@ def main():
 def main():
     i = int(sys.argv[1])
 
-    c_arr [1, 2, 4]
+    c_arr = [1, 2, 4]
     c = c_arr[i % 3]
 
     train_data = generate_trainset(270000, discrete_c=1, low=c, high=c, r_max=1)
