@@ -617,6 +617,8 @@ def main():
                 'mse': np.zeros(num_deltas),
                 }
 
+    num_deltas = 30
+    
     for delta_s in range(num_deltas):
         test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
         nn_preds, _ = test_nn(nn, nnx, test_data)
