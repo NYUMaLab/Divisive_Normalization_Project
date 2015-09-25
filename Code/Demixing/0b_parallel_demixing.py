@@ -151,35 +151,6 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
-def generate_trainset_cat(ndata, low=.3, high=1.3, crange=.5, r_max=10):
-    numvec = np.random.binomial(1, .5, size=ndata).astype(int)
-    c_0 = random_c(ndata, 1, high, high+crange, True)
-    c_1 = random_c(ndata, 1, low, low+crange, True)
-    s_0, s_1 = np.random.rand(2, ndata) * 120 - 60
-    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, "poisson", s_0, s_1, c_0, c_1)
-    y = s[range(ndata), numvec]
-    return r, y, s, c, numvec 
-    
-def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, noise, s_0, s_1, c_0, c_1):
-    c0vec = c_0 * np.ones(ndata)
-    c1vec = c_1 * numvec
-    c_rms = np.sqrt(np.square(c0vec) + np.square(c1vec))
-    sprefs_data = np.tile(sprefs, (ndata, 1))
-    s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_0 = c0vec * s_0t.T
-    s_1t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_1 = c1vec * s_1t.T
-    #r = r_max * (stim_0 + stim_1)/(c_50 + c_rms)
-    r = r_max * (stim_0 + stim_1)/(c_rms)
-    #r = r_max * (stim_0 + stim_1)
-    r = r.T
-    s = np.array((s_0, s_1)).T
-    s = s/90
-    c = np.array((c_0, c_1)).T
-    if noise == "poisson":
-        r = np.random.poisson(r) + 0.0
-    return r, numvec, s, c 
-
 def lik_means(s_1, s_2, c_0=.5, c_1=.5, sprefs=sprefs, sigtc_sq=sigtc_sq, r_max=10):
     sprefs_data = np.tile(sprefs, (len(s_1), 1))
     s_0t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
@@ -601,10 +572,9 @@ def test_nn(nn, nnx, test_data):
     #print nn.get_params()
     return pred_ys, true_ys
 
+"""
+#Finding parameters
 def main():
-    """
-    arguments: [smaller stimulus, larger stimulus, amount of training data]
-    """
     i = int(sys.argv[1])
 
     lrs = np.array([.01, .005, .001, .0005, .0001, .00001])
@@ -623,6 +593,51 @@ def main():
 
     pkl_file = open(file_name, 'wb')
     pickle.dump(nn, pkl_file)
+    pkl_file.close()
+"""
+
+def main():
+    i = int(sys.argv[1])
+
+    c_arr [1, 2, 4]
+    c = c_arr[i % 3]
+
+    train_data = generate_trainset(270000, discrete_c=1, low=c, high=c, r_max=1)
+    valid_data = generate_testset(900, discrete_c=1, low=c, high=c, r_max=1)
+    nn = train_nn(train_data, valid_dataset=valid_data, n_hidden=100, learning_rate=lr, n_epochs=100, rho=rho, mu=mu, nesterov=n)
+
+    nn_stats = {'mean_s1': np.zeros(num_deltas), 
+                'mean_s2': np.zeros(num_deltas), 
+                'bias_s1': np.zeros(num_deltas), 
+                'bias_s2': np.zeros(num_deltas), 
+                'var_s1': np.zeros(num_deltas), 
+                'var_s2': np.zeros(num_deltas), 
+                'cov': np.zeros(num_deltas), 
+                'corr': np.zeros(num_deltas),
+                'mse': np.zeros(num_deltas),
+                }
+
+    for delta_s in range(num_deltas):
+        test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
+        nn_preds, _ = test_nn(nn, nnx, test_data)
+        nn_preds = nn_preds.T * 90
+        stats = get_statistics(s1, s1 + delta_s, nn_preds)
+        nn_stats['mean_s1'][delta_s] = stats['mean_s1']
+        nn_stats['mean_s2'][delta_s] = stats['mean_s2']
+        nn_stats['bias_s1'][delta_s] = stats['bias_s1']
+        nn_stats['bias_s2'][delta_s] = stats['bias_s2']
+        nn_stats['var_s1'][delta_s] = stats['var_s1']
+        nn_stats['var_s2'][delta_s] = stats['var_s2']
+        nn_stats['cov'][delta_s] = stats['cov']
+        nn_stats['corr'][delta_s] = stats['corr']
+        nn_stats['mse'][delta_s] = stats['mse']
+
+    file_name = "nn_runs" + str(i) + ".pkl"
+
+    out = (nn, nn_stats, c)
+
+    pkl_file = open(file_name, 'wb')
+    pickle.dump(out, pkl_file)
     pkl_file.close()
 
 if __name__ == "__main__":
