@@ -562,13 +562,13 @@ def main():
     elif j == 2:
         c_arr = [[[1, 2, 4], [1, 2, 4]]]
         tc_arr = [[[1, 2, 4], [1, 2, 4]]]
-        tc = train_c_arr[i % len(c_arr)]
+        tc = tc_arr[i % len(c_arr)]
         c = c_arr[i % len(c_arr)]
         train_data = generate_trainset(270000, discrete_c=tc, r_max=1)
     elif j == 3:
         c_arr = [[[1, 2, 4], [1, 2, 4]]]
         tc_arr = [[[1, 2, 4], [1, 2, 4]]]
-        tc = train_c_arr[i % len(c_arr)]
+        tc = tc_arr[i % len(c_arr)]
         c = c_arr[i % len(c_arr)]
         train_data = generate_trainset(270000, highlow = True, discrete_c=tc, r_max=1)
     
