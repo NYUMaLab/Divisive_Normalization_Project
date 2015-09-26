@@ -98,6 +98,9 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1
 def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
     s_0, s_1 = random_s(ndata, True)
     if highlow:
+        if type(discrete_c) == list:
+            low = min(discrete_c[0])
+            high = max(discrete_c[0])
         c_arr = np.concatenate((np.ones((ndata/2, 2)) * low, np.ones((ndata/2, 2)) * high), axis=0)
         np.random.shuffle(c_arr)
         c_0, c_1 = c_arr.T
@@ -568,30 +571,6 @@ def test_nn(nn, nnx, test_data):
     #print nn.get_params()
     return pred_ys, true_ys
 
-"""
-#Finding parameters
-def main():
-    i = int(sys.argv[1])
-
-    lrs = np.array([.01, .005, .001, .0005, .0001, .00001])
-    rhos = np.array([0, .75, .9, .95, .99, .999])
-    mus = np.array([0, .75, .9, .95, .99, .999])
-    nests = np.array([True, False])
-    cs = np.array([1, 2, 4])
-    params = cartesian([lrs, rhos, mus, nests, cs])
-    lr, rho, mu, n, c = params[i]
-
-    train_data = generate_trainset(270000, discrete_c=1, low=c, high=c, r_max=1)
-    valid_data = generate_testset(900, discrete_c=1, low=c, high=c, r_max=1)
-    nn = train_nn(train_data, valid_dataset=valid_data, n_hidden=100, learning_rate=lr, n_epochs=100, rho=rho, mu=mu, nesterov=n)
-
-    file_name = "nn_optim" + str(i) + ".pkl"
-
-    pkl_file = open(file_name, 'wb')
-    pickle.dump(nn, pkl_file)
-    pkl_file.close()
-"""
-
 def get_statistics(s1, s2, preds):
     mean_s1 = np.mean(preds[0])
     mean_s2 = np.mean(preds[1])
@@ -608,12 +587,29 @@ def get_statistics(s1, s2, preds):
 
 def main():
     i = int(sys.argv[1])
+    j = int(sys.argv[2])
 
-    #c_arr = [[[1], [1]], [[2], [2]], [[4], [4]], [[1], [4]], [[4], [1]]]
-    c_arr = [[[1], [4]], [[4], [1]]]
-    c = c_arr[i % len(c_arr)]
-
-    train_data = generate_trainset(270000, discrete_c=c, r_max=1)
+    
+    if j == 1:
+        #c_arr = [[[1], [1]], [[2], [2]], [[4], [4]], [[1], [4]], [[4], [1]]]
+        c_arr = [[[1], [4]], [[4], [1]]]
+        tc_arr = [[[1], [4]], [[4], [1]]]
+        tc = tc_arr[i % len(c_arr)]
+        c = c_arr[i % len(c_arr)]
+        train_data = generate_trainset(270000, discrete_c=tc, r_max=1)
+    elif j == 2:
+        c_arr = [[[1, 2, 4], [1, 2, 4]]]
+        tc_arr = [[[1, 2, 4], [1, 2, 4]]]
+        tc = train_c_arr[i % len(c_arr)]
+        c = c_arr[i % len(c_arr)]
+        train_data = generate_trainset(270000, discrete_c=tc, r_max=1)
+    elif j == 3:
+        c_arr = [[[1, 2, 4], [1, 2, 4]]]
+        tc_arr = [[[1, 2, 4], [1, 2, 4]]]
+        tc = train_c_arr[i % len(c_arr)]
+        c = c_arr[i % len(c_arr)]
+        train_data = generate_trainset(270000, highlow = True, discrete_c=tc, r_max=1)
+    
     valid_data = generate_testset(900, discrete_c=c, r_max=1)
     nn, nnx, valid_mse = train_nn(train_data, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
 
