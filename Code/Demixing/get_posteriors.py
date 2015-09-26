@@ -98,6 +98,9 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1
 def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
     s_0, s_1 = random_s(ndata, True)
     if highlow:
+        if type(discrete_c) == list:
+            low = min(discrete_c[0])
+            high = max(discrete_c[0])
         c_arr = np.concatenate((np.ones((ndata/2, 2)) * low, np.ones((ndata/2, 2)) * high), axis=0)
         np.random.shuffle(c_arr)
         c_0, c_1 = c_arr.T
@@ -107,15 +110,13 @@ def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_
             perm_cs = cartesian((cs, cs))
         else:
             perm_cs = cartesian(discrete_c)
-        c_arr = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0)
+        c_arr = np.repeat(perm_cs, ndata/len(perm_cs), axis=0)
         np.random.shuffle(c_arr)
         c_0, c_1 = c_arr.T
-        """
-        print ndata/(discrete_c**2), "trials per contrast level"
-        if ndata%(discrete_c**2) != 0:
+        print ndata/len(perm_cs), "trials per contrast level"
+        if ndata%len(perm_cs) != 0:
             print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-        """
-        ndata = ndata / (discrete_c**2) * (discrete_c**2)
+        ndata = ndata / len(perm_cs) * len(perm_cs)
     else:
         c_0, c_1 = np.ones((2, ndata)) * .5
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
@@ -133,13 +134,11 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
                 perm_cs = cartesian((cs, cs))
             else:
                 perm_cs = cartesian(discrete_c)
-            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0).T
-            """
-            print ndata/(discrete_c**2), "trials per contrast level"
-            if ndata%(discrete_c**2) != 0:
+            c_0, c_1 = np.repeat(perm_cs, ndata/len(perm_cs), axis=0).T
+            print ndata/len(perm_cs), "trials per contrast level"
+            if ndata%len(perm_cs) != 0:
                 print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-            """
-            ndata = ndata / (discrete_c**2) * (discrete_c**2)
+            ndata = ndata / len(perm_cs) * len(perm_cs)
         else:
             c_0, c_1 = np.random.rand(2, ndata) * c_range + low
     if not stim_0:
@@ -205,10 +204,16 @@ def posterior(r, means, s1_grid, s2_grid):
 def posterior_setup(low=.3, high=.7, discrete_c = 3, num_s=100, r_max=10):
     grid = np.linspace(-60, 60, num_s)
     s1s = np.concatenate([[grid[i]]*(num_s-i) for i in range(num_s)])
-    cs = np.linspace(low, high, discrete_c)
-    s1_grid, c1_grid, c2_grid = cartesian((s1s, cs, cs)).T
     s2s = np.concatenate([grid[i:num_s+1] for i in range(num_s)])
-    s2_grid = np.repeat(s2s, (discrete_c**2), axis=0)
+    if type(discrete_c) == int:
+        cs = np.linspace(low, high, discrete_c)
+        s1_grid, c1_grid, c2_grid = cartesian((s1s, cs, cs)).T
+        s2_grid = np.repeat(s2s, (discrete_c**2), axis=0)
+    else:
+        c1 = discrete_c[0]
+        c2 = discrete_c[1]
+        s1_grid, c1_grid, c2_grid = cartesian((s1s, c1, c2)).T
+        s2_grid = np.repeat(s2s, (len(c1) * len(c2)), axis=0)
     means = lik_means(s1_grid, s2_grid, c_0=c1_grid, c_1=c2_grid, r_max=r_max)
     partial_post = partial(posterior, means=means, s1_grid=s1_grid, s2_grid=s2_grid)
     return partial_post
@@ -228,16 +233,18 @@ def main():
     """
     arguments: [smaller stimulus, larger stimulus, amount of training data]
     """
+    """
     s_i = int(sys.argv[1])
 
     delta_s = s_i / 3
     i = s_i % 3
-    c_arr = [1, 2, 4]
-    c = c_arr[i]
+    """
+    delta_s = int(sys.argv[1])
+    c_arr = [[[1, 2, 4],[1, 2, 4]]]
 
     s1=-30
-    post_func = posterior_setup(low=c, high=c, discrete_c=1, num_s=60, r_max=1)
-    test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=1, low=c, high=c, r_max=1)
+    post_func = posterior_setup(discrete_c=c_arr, num_s=60, r_max=1)
+    test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=c_arr, r_max=1)
     r, _, _ = test_data
     posts = get_posteriors_pool(r, post_func)
     output = (posts, r, c, delta_s)

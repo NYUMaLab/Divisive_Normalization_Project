@@ -150,44 +150,6 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
-def lik_means(s_1, s_2, c_0=.5, c_1=.5, sprefs=sprefs, sigtc_sq=sigtc_sq, r_max=10):
-    sprefs_data = np.tile(sprefs, (len(s_1), 1))
-    s_0t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_0 = c_0 * s_0t.T
-    s_1t = np.exp(-np.square((np.transpose(np.tile(s_2, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
-    stim_1 = c_1 * s_1t.T
-    r = r_max * (stim_0 + stim_1)
-    return r.T
-def posterior(r, means, s1_grid, s2_grid):
-    ns_liks = poisson.pmf(r, mu=means)
-    stim_liks = np.prod(ns_liks, axis=1)
-    #p_s = 2/14400
-    #logp_s = np.log(p_s)
-    logp_s = -3.8573325
-    loglik = np.sum(np.log(ns_liks), axis=1)
-    mean1 = np.sum(s1_grid * np.exp(loglik + logp_s)/np.sum(np.exp(loglik + logp_s)))
-    mean2 = np.sum(s2_grid * np.exp(loglik + logp_s)/np.sum(np.exp(loglik + logp_s)))
-    expsquare1 = np.sum(np.square(s1_grid) * np.exp(loglik + logp_s)/np.sum(np.exp(loglik + logp_s)))
-    expsquare2 = np.sum(np.square(s2_grid) * np.exp(loglik + logp_s)/np.sum(np.exp(loglik + logp_s)))
-    var1 = expsquare1 - np.square(mean1)
-    var2 = expsquare2 - np.square(mean2)
-    return mean1, mean2, var1, var2
-def posterior_setup(low=.3, high=.7, discrete_c = 3, num_s=100, r_max=10):
-    grid = np.linspace(-60, 60, num_s)
-    s1s = np.concatenate([[grid[i]]*(num_s-i) for i in range(num_s)])
-    cs = np.linspace(low, high, discrete_c)
-    s1_grid, c1_grid, c2_grid = cartesian((s1s, cs, cs)).T
-    s2s = np.concatenate([grid[i:num_s+1] for i in range(num_s)])
-    s2_grid = np.repeat(s2s, (discrete_c**2), axis=0)
-    means = lik_means(s1_grid, s2_grid, c_0=c1_grid, c_1=c2_grid, r_max=r_max)
-    partial_post = partial(posterior, means=means, s1_grid=s1_grid, s2_grid=s2_grid)
-    return partial_post
-def get_posteriors(r, post_func):
-    posteriors = {'mean_s1': None, 'mean_s2': None, 'var_s1': None, 'var_s2': None}
-    p = np.array([post_func(r[i]) for i in range(len(r))]).T
-    posteriors['mean_s1'], posteriors['mean_s2'], posteriors['var_s1'], posteriors['var_s2'] = p
-    return posteriors
-
 """
 Multilayer ReLU net
 """

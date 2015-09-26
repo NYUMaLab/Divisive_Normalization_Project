@@ -98,6 +98,9 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1
 def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
     s_0, s_1 = random_s(ndata, True)
     if highlow:
+        if type(discrete_c) == list:
+            low = min(discrete_c[0])
+            high = max(discrete_c[0])
         c_arr = np.concatenate((np.ones((ndata/2, 2)) * low, np.ones((ndata/2, 2)) * high), axis=0)
         np.random.shuffle(c_arr)
         c_0, c_1 = c_arr.T
@@ -107,15 +110,13 @@ def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_
             perm_cs = cartesian((cs, cs))
         else:
             perm_cs = cartesian(discrete_c)
-        c_arr = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0)
+        c_arr = np.repeat(perm_cs, ndata/len(perm_cs), axis=0)
         np.random.shuffle(c_arr)
         c_0, c_1 = c_arr.T
-        """
-        print ndata/(discrete_c**2), "trials per contrast level"
-        if ndata%(discrete_c**2) != 0:
+        print ndata/len(perm_cs), "trials per contrast level"
+        if ndata%len(perm_cs) != 0:
             print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-        """
-        ndata = ndata / (discrete_c**2) * (discrete_c**2)
+        ndata = ndata / len(perm_cs) * len(perm_cs)
     else:
         c_0, c_1 = np.ones((2, ndata)) * .5
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
@@ -133,13 +134,11 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
                 perm_cs = cartesian((cs, cs))
             else:
                 perm_cs = cartesian(discrete_c)
-            c_0, c_1 = np.repeat(perm_cs, ndata/(discrete_c**2), axis=0).T
-            """
-            print ndata/(discrete_c**2), "trials per contrast level"
-            if ndata%(discrete_c**2) != 0:
+            c_0, c_1 = np.repeat(perm_cs, ndata/len(perm_cs), axis=0).T
+            print ndata/len(perm_cs), "trials per contrast level"
+            if ndata%len(perm_cs) != 0:
                 print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
-            """
-            ndata = ndata / (discrete_c**2) * (discrete_c**2)
+            ndata = ndata / len(perm_cs) * len(perm_cs)
         else:
             c_0, c_1 = np.random.rand(2, ndata) * c_range + low
     if not stim_0:
