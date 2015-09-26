@@ -57,7 +57,7 @@ def main():
 		    nn_stats['corr'][delta_s][pc] = stats['corr']
 		    nn_stats['mse'][delta_s][pc] = stats['mse']
 
-    file_name = "nn_runs_" + str(j) + "_" + str(i) + ".pkl"
+    file_name = "nn_tests_" + str(j) + "_" + str(i) + ".pkl"
 
     out = (nn, nnx, valid_mse, nn_stats, c)
 
