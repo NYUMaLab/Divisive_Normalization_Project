@@ -240,7 +240,7 @@ def main():
     i = s_i % 3
     """
     delta_s = int(sys.argv[1])
-    c_arr = [[[1, 2, 4],[1, 2, 4]]]
+    c_arr = [[1, 2, 4],[1, 2, 4]]
 
     s1=-30
     post_func = posterior_setup(discrete_c=c_arr, num_s=60, r_max=1)
