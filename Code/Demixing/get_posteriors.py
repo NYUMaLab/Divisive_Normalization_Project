@@ -233,18 +233,23 @@ def main():
     """
     arguments: [smaller stimulus, larger stimulus, amount of training data]
     """
-    """
     s_i = int(sys.argv[1])
+    j = int(sys.argv[2])
+    
 
-    delta_s = s_i / 3
-    i = s_i % 3
-    """
-    delta_s = int(sys.argv[1])
-    c_arr = [[1, 2, 4],[1, 2, 4]]
+    if j == 1:
+        #c_arr = [[[1], [1]], [[2], [2]], [[4], [4]], [[1], [4]], [[4], [1]]]
+        c_arr = [[[1], [4]], [[4], [1]]]
+    if j == 2:
+        c_arr = [[[1, 2, 4], [1, 2, 4]]]
+        
+    delta_s = s_i / len(c_arr)
+    i = s_i % len(c_arr)
+    c = c_arr[i]
 
     s1=-30
-    post_func = posterior_setup(discrete_c=c_arr, num_s=60, r_max=1)
-    test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=c_arr, r_max=1)
+    post_func = posterior_setup(discrete_c=c, num_s=60, r_max=1)
+    test_data = generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=c, r_max=1)
     r, _, _ = test_data
     posts = get_posteriors_pool(r, post_func)
     output = (posts, r, c, delta_s)

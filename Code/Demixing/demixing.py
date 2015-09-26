@@ -1,26 +1,66 @@
 import numpy as np
-import math
-import os
-import sys
-import time
 import theano
 import theano.tensor as T
-import pystan
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import argparse
+from scipy.stats import poisson
+import matplotlib.patches as mpatches
+from functools import partial
+import pandas as pd
+import pickle
+import time
+import sys
+import multiprocessing as mp
 
 nneuron = 61
 min_angle = -90
 max_angle = 90
 sprefs = np.linspace(min_angle, max_angle, nneuron)
-ndata = 3000
-
-r_max = 10
+eps = np.finfo(np.float64).eps
 sigtc_sq = float(10**2)
-sigtc = 10
-c_50 = 13.1
+
+def cartesian(arrays, out=None):
+    """Generate a cartesian product of input arrays.
+    Parameters
+    ----------
+    arrays : list of array-like
+        1-D arrays to form the cartesian product of.
+    out : ndarray
+        Array to place the cartesian product in.
+    Returns
+    -------
+    out : ndarray
+        2-D array of shape (M, len(arrays)) containing cartesian products
+        formed of input arrays.
+    Examples
+    --------
+    >>> cartesian(([1, 2, 3], [4, 5], [6, 7]))
+    array([[1, 4, 6],
+           [1, 4, 7],
+           [1, 5, 6],
+           [1, 5, 7],
+           [2, 4, 6],
+           [2, 4, 7],
+           [2, 5, 6],
+           [2, 5, 7],
+           [3, 4, 6],
+           [3, 4, 7],
+           [3, 5, 6],
+           [3, 5, 7]])
+    """
+    arrays = [np.asarray(x) for x in arrays]
+    shape = (len(x) for x in arrays)
+    dtype = arrays[0].dtype
+
+    ix = np.indices(shape)
+    ix = ix.reshape(len(arrays), -1).T
+
+    if out is None:
+        out = np.empty_like(ix, dtype=dtype)
+
+    for n, arr in enumerate(arrays):
+        out[:, n] = arrays[n][ix[:, n]]
+
+    return out
 
 def random_s(ndata, sort):
     s = np.random.rand(2, ndata) * 120 - 60
@@ -28,20 +68,17 @@ def random_s(ndata, sort):
         s = np.sort(s, axis=0)
     return s[0], s[1]
 
-def generate_trainset(ndata, r_max=10):
-    s_0, s_1 = random_s(ndata, True)
-    c_0, c_1 = np.ones((2, ndata)) * .5
-    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
-    return r, s, c
-
-def generate_s1set(ndata):
-    s_0, s_1 = random_s(ndata, True)
-    c_0 = np.ones(ndata)
-    c_1 = np.zeros(ndata)
-    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
-    return r, s, c
+def random_c(ndata, ndims, low, high, sort):
+    c_range = high - low
+    if ndims == 1:
+        c = np.random.rand(ndims, ndata)[0] * c_range + low
+    else:
+        c = np.random.rand(ndims, ndata) * c_range + low
+    if sort:
+        c = np.sort(c, axis=0)
+    return c
     
-def generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, noise, sort, s_0, s_1, c_0, c_1):
+def generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, noise, sort, s_0, s_1, c_0, c_1, c_50=13.1):
     c_rms = np.sqrt(np.square(c_0) + np.square(c_1))
     sprefs_data = np.tile(sprefs, (ndata, 1))
     s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
@@ -58,510 +95,175 @@ def generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, noise, sort, s_
         r = np.random.poisson(r) + 0.0
     return r, s, c
 
-def generate_s_data(stim_0, stim_1, ndata):
-    c_0, c_1 = np.ones((2, ndata)) * .5
-    s_0, s_1 = np.ones((2, ndata))
-    s_0 = s_0 * stim_0
-    s_1 = s_1 * stim_1
-    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, c_50, r_max, "poisson", True, s_0, s_1, c_0, c_1)
+def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_max=10):
+    s_0, s_1 = random_s(ndata, True)
+    if highlow:
+        if type(discrete_c) == list:
+            low = min(discrete_c[0])
+            high = max(discrete_c[0])
+        c_arr = np.concatenate((np.ones((ndata/2, 2)) * low, np.ones((ndata/2, 2)) * high), axis=0)
+        np.random.shuffle(c_arr)
+        c_0, c_1 = c_arr.T
+    elif discrete_c:
+        if type(discrete_c) == int:
+            cs = np.linspace(low, high, discrete_c)
+            perm_cs = cartesian((cs, cs))
+        else:
+            perm_cs = cartesian(discrete_c)
+        c_arr = np.repeat(perm_cs, ndata/len(perm_cs), axis=0)
+        np.random.shuffle(c_arr)
+        c_0, c_1 = c_arr.T
+        print ndata/len(perm_cs), "trials per contrast level"
+        if ndata%len(perm_cs) != 0:
+            print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
+        ndata = ndata / len(perm_cs) * len(perm_cs)
+    else:
+        c_0, c_1 = np.ones((2, ndata)) * .5
+    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
-def fisher_inf(s_0, s_1, c_0, c_1):
-    fs_0 = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
-    qs_0 = r_max * c_0 * fs_0
-    df_s0 = ((-s_0 + sprefs)/sigtc_sq) * qs_0
-    fs_1 = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs))/(2 * sigtc_sq))[0]
-    qs_1 = r_max * c_1 * fs_1
-    df_s1 = ((-s_1 + sprefs)/sigtc_sq) * qs_1
-    Q = qs_0 + qs_1
-    Q_inv = 1/Q
-    J_11 = np.sum(np.square(df_s0) * Q_inv)
-    J_22 = np.sum(np.square(df_s1) * Q_inv)
-    J_12 = J_21 = np.sum(df_s0 * df_s1 * Q_inv)
-    fisher = np.linalg.inv([[J_11, J_12], [J_21, J_22]])
-    return fisher
+def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, discrete_c=None, low=.5, high=.5, r_max=10):
+    if con_0 is not None:
+        c_0 = np.ones(ndata) * con_0
+        c_1 = np.ones(ndata) * con_1
+    else:
+        c_range = high - low
+        if discrete_c:
+            if type(discrete_c) == int:
+                cs = np.linspace(low, high, discrete_c)
+                perm_cs = cartesian((cs, cs))
+            else:
+                perm_cs = cartesian(discrete_c)
+            c_0, c_1 = np.repeat(perm_cs, ndata/len(perm_cs), axis=0).T
+            print ndata/len(perm_cs), "trials per contrast level"
+            if ndata%len(perm_cs) != 0:
+                print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
+            ndata = ndata / len(perm_cs) * len(perm_cs)
+        else:
+            c_0, c_1 = np.random.rand(2, ndata) * c_range + low
+    if not stim_0:
+        s_0, s_1 = random_s(ndata, True)
+    else:
+        s_0, s_1 = np.ones((2, ndata))
+        s_0 = s_0 * stim_0
+        s_1 = s_1 * stim_1
+    r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
+    return r, s, c
 
-def fit_optimal(r, sm, N=61, init=None, sprefs=sprefs, c_1=.5, c_2=.5, c_50=13.1, r_max=10, c_rms=0.707106781, sig_tc=10, sigtc_sq=10**2):
-    neurons_dat = {'N': 61,
-                   'r': r[0].astype(int),
-                   'sprefs': sprefs,
-                   'c_1': .5,
-                   'c_2': .5,
-                   'c_50': 13.1,
-                   'r_max': r_max,
-                   'c_rms': 0.707106781,
-                   'sig_tc': 10,
-                   'sigtc_sq': sigtc_sq}
-
-    optimal = np.zeros((2, ndata))
-    print init
-    for i in range(len(r)):
-        neurons_dat['r'] = r[i].astype(int)
-        if not init:
-            op = sm.optimizing(data=neurons_dat)
-        else:     
-            op = sm.optimizing(data=neurons_dat, init=init)
-        optimal[0][i], optimal[1][i] = op['s_1'], op['s_2']
-        optimal = np.sort(optimal, axis=0)
-    return optimal
-
-"""
-Multilayer ReLU net
-"""
-
-def relu(x):
-    return theano.tensor.switch(x<0, 0, x)
-
-class HiddenLayer(object):
-    def __init__(self, rng, input, n_in, n_out, W=None, b=None,
-                 activation=T.nnet.sigmoid):
-        """
-        Typical hidden layer of a MLP: units are fully-connected and have
-        sigmoidal activation function. Weight matrix W is of shape (n_in,n_out)
-        and the bias vector b is of shape (n_out,).
-
-        :type rng: np.random.RandomState
-        :param rng: a random number generator used to initialize weights
-
-        :type input: theano.tensor.dmatrix
-        :param input: a symbolic tensor of shape (n_examples, n_in)
-
-        :type n_in: int
-        :param n_in: dimensionality of input
-
-        :type n_out: int
-        :param n_out: number of hidden units
-
-        :type activation: theano.Op or function
-        :param activation: Non linearity to be applied in the hidden
-                           layer
-        """
-        self.input = input
-        if W is None:
-            W_values = (1/np.sqrt(n_in)) * np.random.randn(n_in, n_out)
-            
-            W = theano.shared(value=W_values, name='W', borrow=True)
-
-        if b is None:
-            b_values = np.zeros((n_out,), dtype=theano.config.floatX)
-            b = theano.shared(value=b_values, name='b', borrow=True)
-
-        self.W = W
-        self.b = b
-
-        lin_output = T.dot(input, self.W) + self.b
-        self.output = (
-            lin_output if activation is None
-            else activation(lin_output)
-        )
-        # parameters of the model
-        self.params = [self.W, self.b]
-
-class COMLayer(object):
-    def __init__(self, rng, input, n_in, n_out, W=None):
-        """
-        Layer with Center of Mass decoder
-        Params same as above
-        """
-        self.input = input
-        if W is None:
-            W_values = (1/np.sqrt(n_in)) * np.random.randn(n_in, n_out)
-
-            W = theano.shared(value=W_values, name='W', borrow=True)
-
-        self.W = W
-        
-        self.ones = np.ones((n_in, n_out))
-        
-        self.output = T.dot(input, self.W)/T.dot(input, self.ones)
-        
-        # parameters of the model
-        self.params = [self.W]
-
-class MLP(object):
-
-
-    def __init__(self, rng, input, n_in, n_hidden, n_out):
-        """Initialize the parameters for the multilayer perceptron
-
-        :type rng: np.random.RandomState
-        :param rng: a random number generator used to initialize weights
-
-        :type input: theano.tensor.TensorType
-        :param input: symbolic variable that describes the input of the
-        architecture (one minibatch)
-
-        :type n_in: int
-        :param n_in: number of input units, the dimension of the space in
-        which the datapoints lie
-
-        :type n_hidden: int
-        :param n_hidden: number of hidden units
-
-        :type n_out: int
-        :param n_out: number of output units, the dimension of the space in
-        which the labels lie
-
-        """
-
-        self.hiddenLayer1 = HiddenLayer(
-            rng=rng,
-            input=input,
-            n_in=n_in,
-            n_out=n_hidden,
-            #activation=T.nnet.sigmoid
-            activation=relu
-        )
-        
-        self.hiddenLayer2 = HiddenLayer(
-            rng=rng,
-            input=self.hiddenLayer1.output,
-            n_in=n_hidden,
-            n_out=n_out,
-            #activation=relu
-            activation=None
-        )
-        
-        self.y_pred = self.hiddenLayer2.output
-        
-        # the parameters of the model are the parameters of the two layers it is made out of
-        self.params = self.hiddenLayer1.params + self.hiddenLayer2.params
+def generate_trainset_cat(ndata, c_0=4, c_1=1, crange=.5, r_max=1):
+    numvec = np.random.binomial(1, .5, size=ndata).astype(int)
+    s_0, s_1 = np.random.rand(2, ndata) * 120 - 60
+    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, "poisson", s_0, s_1, c_0, c_1)
+    y = s_0
+    return r, y, s, c, numvec 
     
-    def get_params(self):
+def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, noise, s_0, s_1, c_0, c_1):
+    c0vec = c_0 * np.ones(ndata)
+    c1vec = c_1 * numvec
+    c_rms = np.sqrt(np.square(c0vec) + np.square(c1vec))
+    sprefs_data = np.tile(sprefs, (ndata, 1))
+    s_0t = np.exp(-np.square((np.transpose(np.tile(s_0, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_0 = c0vec * s_0t.T
+    s_1t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_1 = c1vec * s_1t.T
+    r = r_max * (stim_0 + stim_1)
+    r = r.T
+    s = np.array((s_0, s_1)).T
+    s = s/90
+    c = np.array((c_0, c_1)).T
+    if noise == "poisson":
+        r = np.random.poisson(r) + 0.0
+    return r, numvec, s, c
 
-        params = {}
-        for param in self.params:
-            name = param.name
-            if name in params:
-                name = name, 2
-            params[name] = param.get_value()
-        return params
-    
-    def mse(self, y):
-        # error between output and target
-        return T.mean((self.y_pred[0] - y[0]) ** 2 + (self.y_pred[1] - y[1]) ** 2)
-    
-    def mse_s1(self, y):
-        # error between output and target
-        return T.mean((self.y_pred[0] - y[0]) ** 2)
-    
-    def sym_mse(self, y):
-        # error between output and target
-        return T.mean(((self.y_pred[0] - y[0]) ** 2 + (self.y_pred[1] - y[1]) ** 2)
-                      * ((self.y_pred[1] - y[0]) ** 2 + (self.y_pred[0] - y[1]) ** 2))
-        
-class COMMLP(object):
+def lik_means(s_1, s_2, c_0=.5, c_1=.5, sprefs=sprefs, sigtc_sq=sigtc_sq, r_max=10):
+    sprefs_data = np.tile(sprefs, (len(s_1), 1))
+    s_0t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_0 = c_0 * s_0t.T
+    s_1t = np.exp(-np.square((np.transpose(np.tile(s_2, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_1 = c_1 * s_1t.T
+    r = r_max * (stim_0 + stim_1)
+    return r.T
 
+def posterior(r, means, s1_grid, s2_grid, ret_grid=False):
+    ns_liks = poisson.pmf(r, mu=means)
+    stim_liks = np.prod(ns_liks, axis=1)
+    #p_s = 2/14400
+    #logp_s = np.log(p_s)
+    logp_s = -3.8573325
+    loglik = np.sum(np.log(ns_liks), axis=1)
+    grid = np.exp(loglik + logp_s)/np.sum(np.exp(loglik + logp_s))
+    mean1 = np.sum(s1_grid * grid)
+    mean2 = np.sum(s2_grid * grid)
+    expsquare1 = np.sum(np.square(s1_grid) * grid)
+    expsquare2 = np.sum(np.square(s2_grid) * grid)
+    var1 = expsquare1 - np.square(mean1)
+    var2 = expsquare2 - np.square(mean2)
+    if ret_grid:
+        return mean1, mean2, var1, var2, (s1_grid, s2_grid, grid)
+    return mean1, mean2, var1, var2
 
-    def __init__(self, rng, input, n_in, n_hidden, n_out):
-        """
-        Params same as above
-        """
+def posterior_setup(low=.3, high=.7, discrete_c = 3, num_s=100, r_max=10):
+    grid = np.linspace(-60, 60, num_s)
+    s1s = np.concatenate([[grid[i]]*(num_s-i) for i in range(num_s)])
+    s2s = np.concatenate([grid[i:num_s+1] for i in range(num_s)])
+    if type(discrete_c) == int:
+        cs = np.linspace(low, high, discrete_c)
+        s1_grid, c1_grid, c2_grid = cartesian((s1s, cs, cs)).T
+        s2_grid = np.repeat(s2s, (discrete_c**2), axis=0)
+    else:
+        c1 = discrete_c[0]
+        c2 = discrete_c[1]
+        s1_grid, c1_grid, c2_grid = cartesian((s1s, c1, c2)).T
+        s2_grid = np.repeat(s2s, (len(c1) * len(c2)), axis=0)
+    means = lik_means(s1_grid, s2_grid, c_0=c1_grid, c_1=c2_grid, r_max=r_max)
+    partial_post = partial(posterior, means=means, s1_grid=s1_grid, s2_grid=s2_grid)
+    return partial_post
 
-        self.hiddenLayer1 = HiddenLayer(
-            rng=rng,
-            input=input,
-            n_in=n_in,
-            n_out=n_hidden,
-            activation=T.nnet.sigmoid
-        )
-        
-        self.hiddenLayer2 = COMLayer(
-            rng=rng,
-            input=self.hiddenLayer1.output,
-            n_in=n_hidden,
-            n_out=n_out,
-        )
-        
-        self.y_pred = self.hiddenLayer2.output
-        
-        # the parameters of the model are the parameters of the two layers it is made out of
-        self.params = self.hiddenLayer1.params + self.hiddenLayer2.params
-    
-    def get_params(self):
+def get_posteriors(r, post_func):
+    posteriors = {'mean_s1': None, 'mean_s2': None, 'var_s1': None, 'var_s2': None}
+    p = np.array([post_func(r[i]) for i in range(len(r))]).T
+    posteriors['mean_s1'], posteriors['mean_s2'], posteriors['var_s1'], posteriors['var_s2'] = p
+    return posteriors
 
-        params = {}
-        for param in self.params:
-            name = param.name
-            if name in params:
-                name = name, 2
-            params[name] = param.get_value()
-        return params
-    
-    def mse(self, y):
-        # error between output and target
-        return T.mean((self.y_pred[0] - y[0]) ** 2 + (self.y_pred[1] - y[1]) ** 2)
-    
-    def sym_mse(self, y):
-        # error between output and target
-        return T.mean(((self.y_pred[0] - y[0]) ** 2 + (self.y_pred[1] - y[1]) ** 2)
-                      * ((self.y_pred[1] - y[0]) ** 2 + (self.y_pred[0] - y[1]) ** 2))
-        
+def get_posteriors_pool(r, post_func):
+    pool = mp.Pool(processes=8)
+    posteriors = {'mean_s1': None, 'mean_s2': None, 'var_s1': None, 'var_s2': None}
+    p = np.array(pool.map(post_func, r)).T
+    posteriors['mean_s1'], posteriors['mean_s2'], posteriors['var_s1'], posteriors['var_s2'] = p
+    return posteriors
 
-def shared_dataset(data_xy, borrow=True):
-        """ Function that loads the dataset into shared variables
-        """
-        data_x, data_y, _ = data_xy
-        shared_x = theano.shared(np.asarray(data_x,
-                                               dtype='float32'),
-                                 borrow=borrow)
-        shared_y = theano.shared(np.asarray(data_y,
-                                               dtype='float32'),
-                                 borrow=borrow)
-        return shared_x, shared_y
+def posterior_cat(r, means, s1_grid):
+    liks = poisson.pmf(r, mu=means)
+    #p_s = 2/14400
+    #logp_s = np.log(p_s)
+    logp_s = -3.8573325
+    #p_cat = 1/2
+    #logp_cat = np.log(p_cat)
+    logp_cat = -0.301029996
+    loglik = np.sum(np.log(liks), axis=1)
+    mean = np.sum(s1_grid * np.exp(loglik + logp_s + logp_cat)/np.sum(np.exp(loglik + logp_s + logp_cat)))
+    expsquare = np.sum(np.square(s1_grid) * np.exp(loglik + logp_s + logp_cat)/np.sum(np.exp(loglik + logp_s + logp_cat)))
+    var = expsquare - np.square(mean)
+    return mean, var
 
-def train_nn(dataset, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=20, test_data=None, COM=False, n_in=61, n_out=2):
-    """
-    Demonstrate stochastic gradient descent optimization for a multilayer
-    perceptron
-
-    :type learning_rate: float
-    :param learning_rate: learning rate used (factor for the stochastic
-    gradient
-
-    :type n_epochs: int
-    :param n_epochs: maximal number of epochs to run the optimizer
-
-   """
-    train_set_x, train_set_y = shared_dataset(dataset)
-
-    # compute number of minibatches for training, validation and testing
-    n_train_batches = train_set_x.get_value(borrow=True).shape[0] / batch_size
-    
-    ######################
-    # BUILD ACTUAL MODEL #
-    ######################
-    print '... building the model'
-
-    # allocate symbolic variables for the data
-    index = T.lscalar()  # index to a [mini]batch
-    x = T.fmatrix('x')   # input data from visual neurons
-    y = T.fmatrix('y')  # posterior
-
-    rng = np.random.RandomState(1234)
-
-    # construct the MLP class
-    nn = MLP(rng=rng, input=x, n_in=n_in, n_hidden=n_hidden, n_out=n_out)
-    
-    if COM == True:
-        nn = COMMLP(rng=rng, input=x, n_in=n_in, n_hidden=n_hidden, n_out=n_out)
-
-    cost = nn.mse(y)
-
-    # compute the gradient of cost with respect to theta (sotred in params)
-    # the resulting gradients will be stored in a list gparams
-    gparams = [T.grad(cost, param) for param in nn.params]
-
-    # specify how to update the parameters of the model as a list of
-    # (variable, update expression) pairs
-
-    updates = [
-        (param, param - learning_rate * gparam)
-        for param, gparam in zip(nn.params, gparams)
-    ]
-    
-    def inspect_inputs(i, node, fn):
-        print i, node, "input(s) value(s):", [input[0] for input in fn.inputs]
-
-    def inspect_outputs(i, node, fn):
-        print "output(s) value(s):", [output[0] for output in fn.outputs]
-
-    # compiling a Theano function `train_model` that returns the cost, but
-    # in the same time updates the parameter of the model based on the rules
-    # defined in `updates`
-    train_model = theano.function(
-        inputs=[index],
-        outputs=cost,
-        updates=updates,
-        givens={
-            x: train_set_x[index * batch_size: (index + 1) * batch_size],
-            y: train_set_y[index * batch_size: (index + 1) * batch_size]
-        }
-    )
-
-    ###############
-    # TRAIN MODEL #
-    ###############
-    print '... training'
-
-    start_time = time.clock()
-
-    epoch = 0
-    done_looping = False
-
-    while (epoch < n_epochs) and (not done_looping):
-        epoch = epoch + 1
-        for minibatch_index in xrange(n_train_batches):
-            
-            minibatch_avg_cost = train_model(minibatch_index)
-
-    end_time = time.clock()
-    
-    return nn, x
-
-def test_nn(nn, nnx, test_data):
-    print 'testing'
-    test_batch_size = 1
-    test_set_x, test_set_y = shared_dataset(test_data)
-    index = T.lscalar()  # index to a [mini]batch
-    x = nnx   # input data from visual neurons
-    test_model = theano.function(
-        inputs=[index],
-        outputs=nn.y_pred,
-        givens={
-            x: test_set_x[index * test_batch_size: (index + 1) * test_batch_size]
-        },
-    )
-    
-    true_ys = test_set_y.get_value()
-    pred_ys = np.zeros((len(true_ys), 2))
-    for i in range(len(true_ys)):
-        pred_ys[i] = test_model(i)
-        #print test_model(i)[0], true_ys[i]
-        #print test_model(i)[0] * 90, true_ys[i]
-    
-    #print nn.get_params()
-    return pred_ys, true_ys
-
-def test_models(s_0, s_1, nn, nnx, sm):
-    init = {'s_1':s_0,
-            's_2':s_1}
-    test_data = generate_s_data(s_0, s_1, 3000)
-    #print test_data
-    nn_preds, _ = test_nn(nn, nnx, test_data)
-    nn_preds = nn_preds.T * 90
-    r, s, c = test_data
-    opt_preds = fit_optimal(r, sm)
-    #opt_preds = fit_optimal(r, sm, init=init)
-    return nn_preds, opt_preds
-
-def plot_trials(nn, optimal, s_1, s_2, ntraindata):
-    plt.rc('text', usetex=True)
-    fig, ax = plt.subplots(1, 1)
-    ax.scatter(nn[0], nn[1], c='b', label='Neural Net')
-    ax.scatter(optimal[0], optimal[1], c='r', label='MLE')
-    ax.set_xlabel(r'\hat{s_1}',fontsize=16)
-    ax.set_ylabel(r'\hat{s_2}',fontsize=16)
-    ax.legend()
-    name = "{s_1}_{s_2}_{ntraindata}.pdf".format(s_1=s_1, s_2=s_2, ntraindata=ntraindata)
-    #plt.show()
-    fig.savefig(name)
-
-def get_contours(nn, optimal):
-    nn1 = nn[0]
-    nn2 = nn[1]
-    opt1 = optimal[0]
-    opt2 = optimal[1]
-    xmin = nn1.min()
-    xmax = nn1.max()
-    ymin = nn2.min()
-    ymax = nn2.max()
-    X, Y = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
-    positions = np.vstack([X.ravel(), Y.ravel()])
-    values_nn = np.vstack([nn1, nn2])
-    kernel_nn = stats.gaussian_kde(values_nn)
-    Z_nn = np.reshape(kernel_nn(positions).T, X.shape)
-    values_opt = np.vstack([opt1, opt2])
-    kernel_opt = stats.gaussian_kde(values_opt)
-    Z_opt = np.reshape(kernel_opt(positions).T, X.shape)
-    """
-    plt.contour(X, Y, Z_nn, colors='b')
-    plt.contour(X, Y, Z_opt, colors='r')
-    """
-    return X, Y, Z_nn, Z_opt
-
-def test_combs(s_arr):
-    l_sarr = len(s_arr)
-    nn = [[None] * l_sarr for k in range(l_sarr)]
-    opt = [[None] * l_sarr for k in range(l_sarr)]
-    for i in range(l_sarr):
-        for j in range(i+1, l_sarr):
-            s1 = s_arr[i]
-            s2 = s_arr[j]
-            nn[i][j], opt[i][j] = test_models(s1, s2, nn2, nnx2, sm)
-    return nn, opt
-
-def plot_contours(nn, opt):
-    axes().set_aspect('equal')
-    plt.xlim(-60, 60)
-    plt.ylim(-60, 60)
-    plt.figure(figsize=(10,10))
-    axes().set_xlabel(r'\hat{s_1}',fontsize=16)
-    axes().set_ylabel(r'\hat{s_2}',fontsize=16)
-    for i in range(l_sarr):
-        for j in range(i+1, l_sarr):
-            X, Y, Z_nn, Z_opt = get_contours(nn[i][j], opt[i][j])
-            plt.contour(X, Y, Z_nn, colors='b', levels=[0.003])
-            plt.contour(X, Y, Z_opt, colors='r', levels=[0.003])
-            #plt.scatter(nn[i][j][0], nn[i][j][1], c='g', label='Neural Net')
-            #plt.scatter(opt[i][j][0], opt[i][j][1], c='y', label='MLE')
-    fig.savefig("stimplot.pdf")
+def posterior_setup_cat(high=4, low=1, num_s=100, r_max=10):
+    grid = np.linspace(-60, 60, num_s)
+    cats = [0, 1]
+    s1_grid, s2_grid, cat_grid = cartesian((grid, grid, cats)).T
+    means = lik_means(s1_grid, s2_grid, cat_grid, c_0=high, c_1=low, r_max=r_max)
+    partial_post = partial(posterior_cat, means=means, s1_grid=s1_grid)
+    return partial_post
 
 def get_statistics(s1, s2, preds):
     mean_s1 = np.mean(preds[0])
     mean_s2 = np.mean(preds[1])
     bias_s1 = mean_s1 - s1
     bias_s2 = mean_s2 - s2
+    mse = np.mean((preds[0] - s1)**2 + (preds[1] - s2)**2)
     covmat = np.cov(preds)
     var_s1 = covmat[0, 0]
     var_s2 = covmat[1, 1]
     cov = covmat[0, 1]
     corr = cov / (np.sqrt(var_s1) * np.sqrt(var_s2))
-    stats = {'mean_s1': mean_s1, 'mean_s2': mean_s2, 'bias_s1': bias_s1, 'bias_s2': bias_s2, 'var_s1': var_s1, 'var_s2': var_s2, 'cov': cov, 'corr': corr}
+    stats = {'mean_s1': mean_s1, 'mean_s2': mean_s2, 'bias_s1': bias_s1, 'bias_s2': bias_s2, 'var_s1': var_s1, 'var_s2': var_s2, 'cov': cov, 'corr': corr, 'mse': mse}
     return stats
-
-def main():
-    """
-    arguments: [smaller stimulus, larger stimulus, amount of training data]
-    """
-    s1 = int(sys.argv[1])
-    s2 = int(sys.argv[2])
-    ntraindata = int(sys.argv[3])
-
-    neurons_code = """
-    data {
-        int<lower=0> N; // number of neurons
-        int r[N]; // neural response
-        real sprefs[N]; // preferred stimuli
-        real<lower=0> c_1;
-        real<lower=0> c_2;
-        int r_max;
-        //real c_rms;
-        //real c_50;
-        //real<lower=0> sig_tc;
-        real<lower=0> sigtc_sq;
-    }
-    parameters {
-        real s_1;
-        real s_2;
-        //real<lower=s_1> s_2;
-    }
-    transformed parameters {
-        real lambda[N];
-        for (n in 1:N)
-            // lambda[n] <- r_max * ((c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)))/(c_rms + c_50));
-            // lambda[n] <- r_max * (c_1 * exp(normal_log(s_1, sprefs[n], sig_tc)) + c_2 * exp(normal_log(s_2, sprefs[n], sig_tc)));
-            lambda[n] <- r_max * (c_1 * exp(- square(s_1 - sprefs[n])/(2 * sigtc_sq)) + c_2 * exp(- square(s_2 - sprefs[n])/(2 * sigtc_sq)));
-    }
-    model {
-        s_1 ~ uniform(-60, 60);
-        s_2 ~ uniform(-60, 60);
-        //s_2 ~ uniform(s_1, 60);
-        r ~ poisson(lambda);
-    }
-    """
-
-
-    #Setting up models
-    sm = pystan.StanModel(model_code=neurons_code)
-    ntraindata = 20000
-    train_data = generate_trainset(ntraindata)
-    nn, nnx = train_nn(train_data, n_hidden=20, learning_rate=.001, n_epochs=100)
-
-    nn_preds, opt_preds = test_models(s1, s2, nn, nnx, sm)
-    plot_trials(nn_preds, opt_preds, s1, s2, ntraindata)
-
-if __name__ == "__main__":
-    main()
-
-
