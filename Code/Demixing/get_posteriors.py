@@ -254,7 +254,7 @@ def main():
     posts = get_posteriors_pool(r, post_func)
     output = (posts, r, c, delta_s)
 
-    file_name = "post_" + str(delta_s) + ".pkl"
+    file_name = "post_" + str(j) + "_" + str(s_i) + ".pkl"
 
     pkl_file = open(file_name, 'wb')
     pickle.dump(output, pkl_file)
