@@ -22,6 +22,10 @@ def main():
     c = c_arr[i % len(c_arr)]
     perm_cs = dm.cartesian(c)
 
+    if j == 0:
+        file_name = 'output_nn_runs_/nn_runs_' + str(i) + '.pkl'
+    else:
+        file_name = 'output_nn_runs_' + str(j) + '/nn_runs_' + str(j) + '_' + str(i) + '.pkl'
     file_name = 'output_nn_runs_' + str(j) + '/nn_runs_' + str(j) + '_' + str(i) + '.pkl'
     if os.path.isfile(file_name):
     	pkl_file = open(file_name, 'rb')
