@@ -109,7 +109,7 @@ def generate_trainset(ndata, highlow=False, discrete_c=None, low=.3, high=.7, r_
         c_0, c_1 = c_arr.T
         print ndata/len(perm_cs), "trials per contrast level"
         if ndata%len(perm_cs) != 0:
-            print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
+            print "Not divisible, only generated", ndata / len(perm_cs) * len(perm_cs), "trials"
         ndata = ndata / len(perm_cs) * len(perm_cs)
     else:
         c_0, c_1 = np.ones((2, ndata)) * .5
@@ -131,7 +131,7 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
             c_0, c_1 = np.repeat(perm_cs, ndata/len(perm_cs), axis=0).T
             print ndata/len(perm_cs), "trials per contrast level"
             if ndata%len(perm_cs) != 0:
-                print "Not divisible, only generated", ndata / (discrete_c**2) * (discrete_c**2), "trials"
+                print "Not divisible, only generated", ndata / len(perm_cs) * len(perm_cs), "trials"
             ndata = ndata / len(perm_cs) * len(perm_cs)
         else:
             c_0, c_1 = np.random.rand(2, ndata) * c_range + low
@@ -449,7 +449,7 @@ class Perceptron(object):
         return T.mean(se)
     
     def valid_mse(self, y):
-        return mse(self, y)
+        return self.mse(y)
         
 
 def shared_dataset(data_xy, borrow=True, no_c=False):
@@ -464,7 +464,7 @@ def shared_dataset(data_xy, borrow=True, no_c=False):
                                  borrow=borrow)
         return shared_x, shared_y
 
-def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=20, linear=False, mult_ys=True, rho=0, nesterov=True, mu=0, n_in=61, n_out=2):
+def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=20, linear=False, print_valid=False, mult_ys=True, rho=0, nesterov=True, mu=0, n_in=61, n_out=2):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
@@ -605,15 +605,14 @@ def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01,
             validation_losses = [validate_model(i) for i in xrange(n_valid_batches)]
             this_validation_loss = np.mean(validation_losses)
             valid_mse[epoch] = this_validation_loss
-            """
-            print(
-                'epoch %i, validation error %f' %
-                (
-                    epoch,
-                    this_validation_loss,
+            if print_valid:
+                print(
+                    'epoch %i, validation error %f' %
+                    (
+                        epoch,
+                        this_validation_loss,
+                    )
                 )
-            )
-            """
             
         epoch = epoch + 1
 
@@ -644,3 +643,25 @@ def test_nn(nn, nnx, test_data):
     
     #print nn.get_params()
     return pred_ys, true_ys
+
+def python_relu(x):
+    return x * (x > 0)
+
+def get_hu_responses(r, nn):
+    nn_params = nn.get_params()
+    b = nn_params['b']
+    W = nn_params['W']
+    trials = python_relu(np.dot(r, W) + b)
+    return trials
+
+def get_mean_acts(s_arr, nn, c):
+    l_sarr = len(s_arr)
+    acts = np.zeros((l_sarr, l_sarr, 20))
+    perm_cs = cartesian(c)
+    for i in range(l_sarr):
+        for j in range(i+1, l_sarr):
+            s1 = s_arr[i]
+            s2 = s_arr[j]
+            r, _, _ = generate_testset(len(perm_cs) * 50, stim_0=s1, stim_1=s2, discrete_c=c, r_max=1)
+            acts[i][j] = np.mean(get_hu_responses(r, nn), axis=0)
+    return np.array(acts)
