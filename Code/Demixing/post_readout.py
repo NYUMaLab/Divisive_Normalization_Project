@@ -62,7 +62,7 @@ def main():
 	sum_corr = np.corrcoef(vp, sum_preds)
 
 	pkl_file = open('readout_' + str(j) + '_' + str(i) + '.pkl', 'wb')
-	pickle.dump((lin_preds, lin_corr, full_preds, full_corr, sum_preds, sum_corr, valid_mse_lin, valid_mse_full), pkl_file)
+	pickle.dump((lin_preds, lin_corr, full_preds, full_corr, sum_preds, sum_corr, valid_mse_lin, valid_mse_full, vp), pkl_file)
 	pkl_file.close()
 if __name__ == "__main__":
 	main()
