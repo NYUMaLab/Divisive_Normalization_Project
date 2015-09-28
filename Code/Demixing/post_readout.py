@@ -13,11 +13,12 @@ from demixing import MLP, HiddenLayer
 
 def main():
 	i = int(sys.argv[1])
+	j = int(sys.argv[2])
 
 	pkl_file = open('readout.pkl', 'rb')
 	posts, testsets = pickle.load(pkl_file)
 
-	file_name = 'output_nn_tests_2/nn_tests_2_' + str(i) + '.pkl'
+	file_name = 'output_nn_tests_' + str(j) + '/nn_tests_' + str(j) + '_' + str(i) + '.pkl'
 	if os.path.isfile(file_name):
 	    pkl_file = open(file_name, 'rb')
 	    nn, nnx, valid_mse, _, _ = pickle.load(pkl_file)
@@ -60,7 +61,7 @@ def main():
 	full_corr = np.corrcoef(vp, full_preds)
 	sum_corr = np.corrcoef(vp, sum_preds)
 
-	pkl_file = open('readout_' + str(i) + '.pkl', 'wb')
+	pkl_file = open('readout_' + str(j) + '_' + str(i) + '.pkl', 'wb')
 	pickle.dump((lin_preds, lin_corr, full_preds, full_corr, sum_preds, sum_corr, valid_mse_lin, valid_mse_full), pkl_file)
 	pkl_file.close()
 if __name__ == "__main__":
