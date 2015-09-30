@@ -23,7 +23,7 @@ def main():
     perm_cs = dm.cartesian(c)
 
     if j == 0:
-        file_name = 'output_nn_runs_/nn_runs_' + str(i) + '.pkl'
+        file_name = 'output_nn_runs/nn_runs_' + str(i) + '.pkl'
     else:
         file_name = 'output_nn_runs_' + str(j) + '/nn_runs_' + str(j) + '_' + str(i) + '.pkl'
     file_name = 'output_nn_runs_' + str(j) + '/nn_runs_' + str(j) + '_' + str(i) + '.pkl'

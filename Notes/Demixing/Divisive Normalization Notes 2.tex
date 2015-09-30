@@ -48,10 +48,10 @@ $r$ is response of neurons ($\sum N$)\\
 $\hat{\mathbf{s}} = \arg\max_\mathbf{s} p(\mathbf{r|s}) p(\mathbf{s})$
 \\
 \\
-$\mathbf{r_\text{hid}} = \phi (\mathbf{Wr + b})$
+$\mathbf{r_\text{hid}} = \phi (\mathbf{W_{\text{hid}}r + b})$
 \\
 \\
-$\mathbf{r} = \text{Poisson} (g_1f (s_1) + g_2f(s_2))$
+$\mathbf{r} = \text{Poisson} (g_1\mathbf{f} (s_1) + g_2\mathbf{f} (s_2))$
 \\
 \\
 $f_i(s)$ is tuning curve of neuron i\\

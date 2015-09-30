@@ -144,14 +144,22 @@ def generate_testset(ndata, stim_0=None, stim_1=None, con_0=None, con_1=None, di
     r, s, c = generate_popcode_data(ndata, nneuron, sigtc_sq, r_max, "poisson", True, s_0, s_1, c_0, c_1)
     return r, s, c
 
-def generate_trainset_cat(ndata, c_0=4, c_1=1, crange=.5, r_max=1):
+def generate_trainset_cat(ndata, c_0=4, c_1=1, r_max=1):
     numvec = np.random.binomial(1, .5, size=ndata).astype(int)
     s_0, s_1 = np.random.rand(2, ndata) * 120 - 60
-    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, "poisson", s_0, s_1, c_0, c_1)
+    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, r_max, "poisson", s_0, s_1, c_0, c_1)
     y = s_0
     return r, y, s, c, numvec 
+
+def generate_testset_cat(ndata, stim_0, stim_1, c_0=4, c_1=1, r_max=1):
+    numvec = np.random.binomial(1, .5, size=ndata).astype(int)
+    s_0 = np.ones(ndata) * stim_0
+    s_1 = np.ones(ndata) * stim_1
+    r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, r_max, "poisson", s_0, s_1, c_0, c_1)
+    y = s.T[0]
+    return r, y, s, c, numvec 
     
-def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, c_50, r_max, noise, s_0, s_1, c_0, c_1):
+def generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, r_max, noise, s_0, s_1, c_0, c_1):
     c0vec = c_0 * np.ones(ndata)
     c1vec = c_1 * numvec
     c_rms = np.sqrt(np.square(c0vec) + np.square(c1vec))
@@ -240,13 +248,31 @@ def posterior_cat(r, means, s1_grid):
     var = expsquare - np.square(mean)
     return mean, var
 
+def get_posteriors_pool_cat(r, post_func):
+    pool = mp.Pool(processes=8)
+    posteriors = {'mean': None, 'var': None}
+    p = np.array(pool.map(post_func, r)).T
+    posteriors['mean'], posteriors['var'] = p
+    return posteriors
+
 def posterior_setup_cat(high=4, low=1, num_s=100, r_max=10):
     grid = np.linspace(-60, 60, num_s)
     cats = [0, 1]
     s1_grid, s2_grid, cat_grid = cartesian((grid, grid, cats)).T
-    means = lik_means(s1_grid, s2_grid, cat_grid, c_0=high, c_1=low, r_max=r_max)
+    means = lik_means_cat(s1_grid, s2_grid, cat_grid, c_0=high, c_1=low, r_max=r_max)
     partial_post = partial(posterior_cat, means=means, s1_grid=s1_grid)
     return partial_post
+
+def lik_means_cat(s_1, s_2, cat, c_0=4, c_1=1, sprefs=sprefs, sigtc_sq=sigtc_sq, r_max=1):
+    c0vec = c_0 * np.ones(len(cat))
+    c1vec = c_1 * cat
+    sprefs_data = np.tile(sprefs, (len(s_1), 1))
+    s_0t = np.exp(-np.square((np.transpose(np.tile(s_1, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_0 = c0vec * s_0t.T
+    s_1t = np.exp(-np.square((np.transpose(np.tile(s_2, (nneuron, 1))) - sprefs_data))/(2 * sigtc_sq))
+    stim_1 = c1vec * s_1t.T
+    r = r_max * (stim_0 + stim_1)
+    return r.T
 
 def get_statistics(s1, s2, preds):
     mean_s1 = np.mean(preds[0])
