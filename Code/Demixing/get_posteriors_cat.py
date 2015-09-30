@@ -19,7 +19,7 @@ def main():
 
     s2=-30
     post_func = dm.posterior_setup_cat(high=4, low=1, num_s=120, r_max=1)
-    test_data = dm.generate_testset_cat(50, s2+delta_s, s2, r_max=1)
+    test_data = dm.generate_testset_cat(4500, s2+delta_s, s2, r_max=1)
     r, y, s, c, numvec = test_data
     posts = dm.get_posteriors_pool_cat(r, post_func)
     output = (posts, r, delta_s)

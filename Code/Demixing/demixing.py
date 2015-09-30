@@ -288,6 +288,14 @@ def get_statistics(s1, s2, preds):
     stats = {'mean_s1': mean_s1, 'mean_s2': mean_s2, 'bias_s1': bias_s1, 'bias_s2': bias_s2, 'var_s1': var_s1, 'var_s2': var_s2, 'cov': cov, 'corr': corr, 'mse': mse}
     return stats
 
+def get_statistics_cat(s, preds):
+    mean = np.mean(preds)
+    bias_s1 = mean - s
+    mse = np.mean((preds - s)**2)
+    var_s1 = np.var(preds)
+    stats = {'mean': mean, 'bias': bias, 'var': var, 'mse': mse}
+    return stats
+
 """
 Multilayer ReLU net
 """
