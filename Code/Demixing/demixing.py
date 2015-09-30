@@ -290,9 +290,9 @@ def get_statistics(s1, s2, preds):
 
 def get_statistics_cat(s, preds):
     mean = np.mean(preds)
-    bias_s1 = mean - s
+    bias = mean - s
     mse = np.mean((preds - s)**2)
-    var_s1 = np.var(preds)
+    var = np.var(preds)
     stats = {'mean': mean, 'bias': bias, 'var': var, 'mse': mse}
     return stats
 

@@ -14,9 +14,9 @@ from demixing import MLP, HiddenLayer
 def main():
     i = int(sys.argv[1])
  
-    td = dm.generate_trainset_cat(20000, low=1, high=4, r_max=1)
-    vd = dm.generate_trainset_cat(3000, low=1, high=4, r_max=1)
-    nn, nnx, valid_mse= train_nn(td_cat, valid_dataset=vd_cat, n_hidden=20, learning_rate=.0005, n_epochs=100, rho=.9, n_out=1)
+    td = dm.generate_trainset_cat(270000, c_0=4, c_1=1, r_max=1)
+    vd = dm.generate_trainset_cat(900, c_0=4, c_1=1, r_max=1)
+    nn, nnx, valid_mse = dm.train_nn(td, valid_dataset=vd, n_hidden=20, learning_rate=.0005, n_epochs=100, rho=.9, n_out=1)
 
     num_deltas = 30
     s2 = -30
@@ -27,10 +27,10 @@ def main():
                 }
 
     for delta_s in range(num_deltas):
-        test_data = generate_testset(4500, stim_0=s2+delta_s, stim_1=s2, discrete_c=c, r_max=1)
-        nn_preds, _ = test_nn(nn, nnx, test_data)
+        test_data = dm.generate_testset_cat(4500, s2+delta_s, s2, r_max=1)
+        nn_preds, _ = dm.test_nn(nn, nnx, test_data)
         nn_preds = nn_preds.T * 90
-        stats = get_statistics_cat(s2_delta_s, nn_preds)
+        stats = dm.get_statistics_cat(s2+delta_s, nn_preds)
         nn_stats['mean'][delta_s] = stats['mean']
         nn_stats['bias'][delta_s] = stats['bias']
         nn_stats['var'][delta_s] = stats['var']
