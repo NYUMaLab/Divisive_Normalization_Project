@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  1 SEP 2015 14:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  28 SEP 2015 17:02
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -610,59 +610,64 @@ Underfull \hbox (badness 10000) in paragraph at lines 44--47
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 48--59
+Underfull \hbox (badness 10000) in paragraph at lines 48--62
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 48--59
+Underfull \hbox (badness 10000) in paragraph at lines 48--62
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--62
 
  []
 
 [1
 
 {/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 64--66
+Underfull \hbox (badness 10000) in paragraph at lines 67--69
 
  []
 
 
-Overfull \hbox (61.5275pt too wide) detected at line 71
+Overfull \hbox (61.5275pt too wide) detected at line 74
 [] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 71--73
+Underfull \hbox (badness 10000) in paragraph at lines 74--76
 
  []
 
 
-Overfull \hbox (31.72748pt too wide) detected at line 82
+Overfull \hbox (31.72748pt too wide) detected at line 85
 [] []
  []
 
 
-Overfull \hbox (44.31377pt too wide) detected at line 97
+Overfull \hbox (44.31377pt too wide) detected at line 100
 [] []
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 97--101
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 97--101
-
  []
 
 [2]
-Underfull \hbox (badness 10000) in paragraph at lines 116--120
+Underfull \hbox (badness 10000) in paragraph at lines 100--104
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 100--104
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 119--123
 
  []
 
 [3]
-Overfull \hbox (11.25311pt too wide) detected at line 147
+Overfull \hbox (11.25311pt too wide) detected at line 150
 [] []
  []
 
@@ -689,32 +694,32 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 
-Underfull \hbox (badness 10000) in paragraph at lines 147--180
+Underfull \hbox (badness 10000) in paragraph at lines 150--183
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 147--180
+Underfull \hbox (badness 10000) in paragraph at lines 150--183
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 147--180
+Underfull \hbox (badness 10000) in paragraph at lines 150--183
 
  []
 
 [4]
-Underfull \hbox (badness 10000) in paragraph at lines 187--189
+Underfull \hbox (badness 10000) in paragraph at lines 190--192
 
  []
 
 
-Overfull \hbox (46.52165pt too wide) detected at line 195
+Overfull \hbox (46.52165pt too wide) detected at line 198
 [] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 195--197
+Underfull \hbox (badness 10000) in paragraph at lines 198--200
 
  []
 
@@ -730,67 +735,67 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--232
+Underfull \hbox (badness 10000) in paragraph at lines 205--235
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--232
+Underfull \hbox (badness 10000) in paragraph at lines 205--235
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 202--232
+Underfull \hbox (badness 10000) in paragraph at lines 205--235
 
  []
 
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 237--240
+Underfull \hbox (badness 10000) in paragraph at lines 240--243
 
  []
 
 
-Overfull \hbox (9.14778pt too wide) detected at line 245
+Overfull \hbox (9.14778pt too wide) detected at line 248
 [] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 245--248
+Underfull \hbox (badness 10000) in paragraph at lines 248--251
 
  []
 
 [6]
-Underfull \hbox (badness 10000) in paragraph at lines 250--252
+Underfull \hbox (badness 10000) in paragraph at lines 253--255
 
  []
 
 
-Overfull \hbox (31.72748pt too wide) detected at line 257
+Overfull \hbox (31.72748pt too wide) detected at line 260
 [] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 257--259
+Underfull \hbox (badness 10000) in paragraph at lines 260--262
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 264--266
+Underfull \hbox (badness 10000) in paragraph at lines 267--269
 
  []
 
 
-Overfull \hbox (44.31377pt too wide) detected at line 271
+Overfull \hbox (44.31377pt too wide) detected at line 274
 [] []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 271--274
+Underfull \hbox (badness 10000) in paragraph at lines 274--277
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 279--281
+Underfull \hbox (badness 10000) in paragraph at lines 282--284
 
  []
 
@@ -824,7 +829,7 @@ onts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfont
 s/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmsy6.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/c
 m/cmsy8.pfb>
-Output written on "Divisive Normalization Notes 2.pdf" (7 pages, 198665 bytes).
+Output written on "Divisive Normalization Notes 2.pdf" (7 pages, 198820 bytes).
 
 PDF statistics:
  111 PDF objects out of 1000 (max. 8388607)
