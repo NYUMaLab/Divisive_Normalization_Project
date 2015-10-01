@@ -16,7 +16,7 @@ def main():
  
     td = dm.generate_trainset_cat(270000, c_0=4, c_1=1, r_max=1)
     vd = dm.generate_trainset_cat(900, c_0=4, c_1=1, r_max=1)
-    nn, nnx, valid_mse = dm.train_nn(td, valid_dataset=vd, n_hidden=20, learning_rate=.0005, n_epochs=100, rho=.9, n_out=1)
+    nn, nnx, valid_mse = dm.train_nn(td, valid_dataset=vd, n_hidden=20, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True, n_out=1)
 
     num_deltas = 30
     s2 = -30
