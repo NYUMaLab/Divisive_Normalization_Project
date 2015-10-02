@@ -148,7 +148,7 @@ def generate_trainset_cat(ndata, c_0=4, c_1=1, r_max=1):
     numvec = np.random.binomial(1, .5, size=ndata).astype(int)
     s_0, s_1 = np.random.rand(2, ndata) * 120 - 60
     r, numvec, s, c  = generate_popcode_data_cat(ndata, numvec, nneuron, sigtc_sq, r_max, "poisson", s_0, s_1, c_0, c_1)
-    y = s_0
+    y = s.T[0]
     return r, y, s, c, numvec 
 
 def generate_testset_cat(ndata, stim_0, stim_1, c_0=4, c_1=1, r_max=1):
@@ -669,7 +669,7 @@ def test_nn(nn, nnx, test_data):
     )
     
     true_ys = test_set_y.get_value()
-    pred_ys = np.zeros((len(true_ys), 2))
+    pred_ys = np.zeros(true_ys.shape)
     for i in range(len(true_ys)):
         pred_ys[i] = test_model(i)
         #print test_model(i)[0], true_ys[i]
