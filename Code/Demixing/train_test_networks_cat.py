@@ -27,7 +27,7 @@ def main():
                 }
 
     for delta_s in range(num_deltas):
-        test_data = dm.generate_testset_cat(4500, s2+delta_s, s2, r_max=1)
+        test_data = dm.generate_testset_cat(4500, s2+delta_s, s2, c_0=4, c_1=1, r_max=1)
         nn_preds, _ = dm.test_nn(nn, nnx, test_data)
         nn_preds = nn_preds.T * 90
         stats = dm.get_statistics_cat(s2+delta_s, nn_preds)
