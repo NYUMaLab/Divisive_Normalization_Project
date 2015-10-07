@@ -1,0 +1,22 @@
+\begin{thebibliography}{1}
+
+\bibitem{NairH10}
+Vinod Nair and Geoffrey~E. Hinton.
+\newblock Rectified linear units improve restricted boltzmann machines.
+\newblock In {\em Proceedings of the 27th International Conference on Machine
+  Learning (ICML-10), June 21-24, 2010, Haifa, Israel}, pages 807--814, 2010.
+
+\bibitem{Sutskever2013}
+Ilya Sutskever, James Martens, George~E. Dahl, and Geoffrey~E. Hinton.
+\newblock On the importance of initialization and momentum in deep learning.
+\newblock In Sanjoy Dasgupta and David Mcallester, editors, {\em Proceedings of
+  the 30th International Conference on Machine Learning (ICML-13)}, volume~28,
+  pages 1139--1147. JMLR Workshop and Conference Proceedings, May 2013.
+
+\bibitem{Tieleman2012}
+T.~Tieleman and G.~Hinton.
+\newblock {Lecture 6.5---RmsProp: Divide the gradient by a running average of
+  its recent magnitude}.
+\newblock COURSERA: Neural Networks for Machine Learning, 2012.
+
+\end{thebibliography}

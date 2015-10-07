@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  6 OCT 2015 17:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  6 OCT 2015 23:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -24,7 +24,7 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-(./nips14submit_e.sty
+(./nips15submit_e.sty
 (/usr/local/texlive/2014/texmf-dist/tex/latex/eso-pic/eso-pic.sty
 Package: eso-pic 2013/10/06 v2.0d eso-pic (RN)
 
@@ -253,24 +253,41 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip46
 )
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/04/25 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: pdftex.def on input line 91.
+)
+\Gin@req@height=\dimen119
+\Gin@req@width=\dimen120
+)
 (./Approximately Bayesian Demixing with Neural Networks.aux)
 \openout1 = `"Approximately Bayesian Demixing with Neural Networks.aux"'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
-LaTeX Font Info:    ... okay on input line 24.
-LaTeX Font Info:    Try loading font information for OT1+ptm on input line 24.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
+LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 25.
 
 (/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ot1ptm.fd
 File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
@@ -280,20 +297,160 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 (/usr/local/texlive/2014/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count115
-\scratchdimen=\dimen119
+\scratchdimen=\dimen121
 \scratchbox=\box31
 \nofMPsegments=\count116
 \nofMParguments=\count117
 \everyMPshowfont=\toks20
 \MPscratchCnt=\count118
-\MPscratchDim=\dimen120
+\MPscratchDim=\dimen122
 \MPnumerator=\count119
 \makeMPintoPDFobject=\count120
 \everyMPtoPDFconversion=\toks21
 )
-Package hyperref Info: Link coloring OFF on input line 24.
+Package hyperref Info: Link coloring OFF on input line 25.
  (/usr/local/texlive/2014/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 
 (/usr/local/texlive/2014/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
-Package: gettitlestring 2010/12/03 v1.4 Cleanup title re
+Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
+)
+\c@section@level=\count121
+)
+LaTeX Info: Redefining \ref on input line 25.
+LaTeX Info: Redefining \pageref on input line 25.
+LaTeX Info: Redefining \nameref on input line 25.
+
+(./Approximately Bayesian Demixing with Neural Networks.out)
+(./Approximately Bayesian Demixing with Neural Networks.out)
+\@outlinefile=\write3
+\openout3 = `"Approximately Bayesian Demixing with Neural Networks.out"'.
+
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+)
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17.28> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 29.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 29.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 29.
+
+(/usr/local/texlive/2014/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 31.
+
+<Tuning_Curves.png, id=16, 1027.84pt x 445.665pt>
+File: Tuning_Curves.png Graphic file (type png)
+ <use Tuning_Curves.png>
+Package pdftex.def Info: Tuning_Curves.png used on input line 45.
+(pdftex.def)             Requested size: 397.48499pt x 172.34659pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 42--56
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 42--56
+
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 66--71
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 66--71
+
+ []
+
+[1
+
+{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+<Fixed_Gains.png, id=43, 1027.84pt x 463.7325pt>
+File: Fixed_Gains.png Graphic file (type png)
+ <use Fixed_Gains.png>
+Package pdftex.def Info: Fixed_Gains.png used on input line 75.
+(pdftex.def)             Requested size: 397.48499pt x 179.3336pt.
+
+<Variable_Gains.png, id=44, 1027.84pt x 461.725pt>
+File: Variable_Gains.png Graphic file (type png)
+ <use Variable_Gains.png>
+Package pdftex.def Info: Variable_Gains.png used on input line 82.
+(pdftex.def)             Requested size: 397.48499pt x 178.55727pt.
+
+<High-Low_Gains.png, id=45, 1027.84pt x 461.725pt>
+File: High-Low_Gains.png Graphic file (type png)
+ <use High-Low_Gains.png>
+Package pdftex.def Info: High-Low_Gains.png used on input line 89.
+(pdftex.def)             Requested size: 397.48499pt x 178.55727pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[2 <./Tuning_Curves.png>]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+(./Approximately Bayesian Demixing with Neural Networks.bbl [3 <./Fixed_Gains.p
+ng> <./Variable_Gains.png>])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 96.
+ [4 <./High-Low_Gains.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 96.
+
+(./Approximately Bayesian Demixing with Neural Networks.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 96.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 96.
+Package rerunfilecheck Info: File `"Approximately Bayesian Demixing with Neural
+ Networks".out' has not changed.
+(rerunfilecheck)             Checksum: 8A6B914143807299A4BB68C33B37AE62;135.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 96.
+ ) 
+Here is how much of TeX's memory you used:
+ 6332 strings out of 493117
+ 91810 string characters out of 6135433
+ 184322 words of memory out of 5000000
+ 9702 multiletter control sequences out of 15000+600000
+ 18418 words of font info for 38 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 37i,8n,39p,1736b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2014/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/te
+xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/tex
+live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texl
+ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texliv
+e/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/
+2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/20
+14/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2014/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2014/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2014/texmf
+-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2014/texmf-dist/fo
+nts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/
+urw/times/utmr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/urw/times/
+utmri8a.pfb>
+Output written on "Approximately Bayesian Demixing with Neural Networks.pdf" (4
+ pages, 494548 bytes).
+PDF statistics:
+ 120 PDF objects out of 1000 (max. 8388607)
+ 92 compressed objects within 1 object stream
+ 21 named destinations out of 1000 (max. 500000)
+ 45 words of extra memory for PDF output out of 10000 (max. 10000000)
+
