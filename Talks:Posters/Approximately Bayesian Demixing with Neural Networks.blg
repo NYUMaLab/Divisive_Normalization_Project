@@ -3,44 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: Approximately Bayesian Demixing with Neural Networks.aux
 The style file: plain.bst
 Database file #1: abdnn.bib
-You've used 3 entries,
+Warning--I didn't find a database entry for "?"
+You've used 8 entries,
             2118 wiz_defined-function locations,
-            520 strings with 4836 characters,
-and the built_in function-call counts, 1325 in all, are:
-= -- 130
-> -- 57
+            561 strings with 5915 characters,
+and the built_in function-call counts, 3292 in all, are:
+= -- 313
+> -- 172
 < -- 3
-+ -- 21
-- -- 18
-* -- 81
-:= -- 200
-add.period$ -- 10
-call.type$ -- 3
-change.case$ -- 17
++ -- 66
+- -- 58
+* -- 250
+:= -- 531
+add.period$ -- 25
+call.type$ -- 8
+change.case$ -- 52
 chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 55
-empty$ -- 109
-format.name$ -- 18
-if$ -- 300
+cite$ -- 8
+duplicate$ -- 113
+empty$ -- 254
+format.name$ -- 58
+if$ -- 699
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 2
-newline$ -- 18
-num.names$ -- 8
-pop$ -- 25
+int.to.str$ -- 8
+missing$ -- 7
+newline$ -- 43
+num.names$ -- 18
+pop$ -- 56
 preamble$ -- 1
-purify$ -- 14
+purify$ -- 44
 quote$ -- 0
-skip$ -- 53
+skip$ -- 89
 stack$ -- 0
-substring$ -- 83
-swap$ -- 26
+substring$ -- 223
+swap$ -- 32
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 12
+type$ -- 32
 warning$ -- 0
-while$ -- 12
-width$ -- 4
-write$ -- 36
+while$ -- 27
+width$ -- 9
+write$ -- 90
+(There was 1 warning)

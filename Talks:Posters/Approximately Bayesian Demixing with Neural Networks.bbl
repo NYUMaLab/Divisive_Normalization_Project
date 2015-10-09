@@ -1,10 +1,34 @@
 \begin{thebibliography}{1}
 
+\bibitem{Britten15061999}
+Kenneth~H. Britten and Hilary~W. Heuer.
+\newblock Spatial summation in the receptive fields of mt neurons.
+\newblock {\em The Journal of Neuroscience}, 19(12):5074--5084, 1999.
+
+\bibitem{Busse2009}
+Laura Busse, Alex~R Wade, and Matteo Carandini.
+\newblock {Representation of concurrent stimuli by population activity in
+  visual cortex.}
+\newblock {\em Neuron}, 64(6):931--42, December 2009.
+
+\bibitem{Maas2013}
+Andrew~L. Maas, Awni~Y. Hannun, and Andrew~Y. Ng.
+\newblock Rectifier nonlinearities improve neural network acoustic models.
+\newblock In {\em International Conference on Machine Learning (ICML)}, 2013.
+
 \bibitem{NairH10}
 Vinod Nair and Geoffrey~E. Hinton.
 \newblock Rectified linear units improve restricted boltzmann machines.
 \newblock In {\em Proceedings of the 27th International Conference on Machine
   Learning (ICML-10), June 21-24, 2010, Haifa, Israel}, pages 807--814, 2010.
+
+\bibitem{Qamar10122013}
+Ahmad~T. Qamar, R.~James Cotton, Ryan~G. George, Jeffrey~M. Beck, Eugenia
+  Prezhdo, Allison Laudano, Andreas~S. Tolias, and Wei~Ji Ma.
+\newblock Trial-to-trial, uncertainty-based adjustment of decision boundaries
+  in visual categorization.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  110(50):20332--20337, 2013.
 
 \bibitem{Sutskever2013}
 Ilya Sutskever, James Martens, George~E. Dahl, and Geoffrey~E. Hinton.
@@ -18,5 +42,11 @@ T.~Tieleman and G.~Hinton.
 \newblock {Lecture 6.5---RmsProp: Divide the gradient by a running average of
   its recent magnitude}.
 \newblock COURSERA: Neural Networks for Machine Learning, 2012.
+
+\bibitem{Zoccolan07112007}
+Davide Zoccolan, Minjoon Kouh, Tomaso Poggio, and James~J. DiCarlo.
+\newblock Trade-off between object selectivity and tolerance in monkey
+  inferotemporal cortex.
+\newblock {\em The Journal of Neuroscience}, 27(45):12292--12307, 2007.
 
 \end{thebibliography}

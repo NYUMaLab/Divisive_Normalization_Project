@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  6 OCT 2015 23:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  7 OCT 2015 23:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -354,103 +354,176 @@ File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 31.
 
-<Tuning_Curves.png, id=16, 1027.84pt x 445.665pt>
-File: Tuning_Curves.png Graphic file (type png)
- <use Tuning_Curves.png>
-Package pdftex.def Info: Tuning_Curves.png used on input line 45.
-(pdftex.def)             Requested size: 397.48499pt x 172.34659pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 42--56
-
- []
+<Neural_Response.png, id=27, 1027.84pt x 546.04pt>
+File: Neural_Response.png Graphic file (type png)
+ <use Neural_Response.png>
+Package pdftex.def Info: Neural_Response.png used on input line 35.
+(pdftex.def)             Requested size: 397.48499pt x 211.16338pt.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 42--56
-
- []
+LaTeX Warning: Citation `Ma2006' on page 1 undefined on input line 41.
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+LaTeX Warning: Citation `?' on page 1 undefined on input line 41.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 66--71
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 66--71
-
- []
+LaTeX Warning: Citation `?' on page 1 undefined on input line 42.
 
 [1
 
-{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-<Fixed_Gains.png, id=43, 1027.84pt x 463.7325pt>
+{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./Neura
+l_Response.png>] <Tuning_Curves.png, id=43, 1027.84pt x 445.665pt>
+File: Tuning_Curves.png Graphic file (type png)
+
+<use Tuning_Curves.png>
+Package pdftex.def Info: Tuning_Curves.png used on input line 56.
+(pdftex.def)             Requested size: 397.48499pt x 172.34659pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--67
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--67
+
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 83--88
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 83--88
+
+ []
+
+<Fixed_Gains.png, id=67, 1027.84pt x 463.7325pt>
 File: Fixed_Gains.png Graphic file (type png)
  <use Fixed_Gains.png>
-Package pdftex.def Info: Fixed_Gains.png used on input line 75.
+Package pdftex.def Info: Fixed_Gains.png used on input line 93.
 (pdftex.def)             Requested size: 397.48499pt x 179.3336pt.
 
-<Variable_Gains.png, id=44, 1027.84pt x 461.725pt>
+<Variable_Gains.png, id=68, 1027.84pt x 461.725pt>
 File: Variable_Gains.png Graphic file (type png)
  <use Variable_Gains.png>
-Package pdftex.def Info: Variable_Gains.png used on input line 82.
+Package pdftex.def Info: Variable_Gains.png used on input line 101.
 (pdftex.def)             Requested size: 397.48499pt x 178.55727pt.
 
-<High-Low_Gains.png, id=45, 1027.84pt x 461.725pt>
+<High-Low_Gains.png, id=69, 1027.84pt x 461.725pt>
 File: High-Low_Gains.png Graphic file (type png)
  <use High-Low_Gains.png>
-Package pdftex.def Info: High-Low_Gains.png used on input line 89.
+Package pdftex.def Info: High-Low_Gains.png used on input line 108.
 (pdftex.def)             Requested size: 397.48499pt x 178.55727pt.
 
+<Single_Estimation.png, id=70, 716.6775pt x 627.34375pt>
+File: Single_Estimation.png Graphic file (type png)
+
+<use Single_Estimation.png>
+Package pdftex.def Info: Single_Estimation.png used on input line 115.
+(pdftex.def)             Requested size: 278.23827pt x 243.56224pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--118
+
+ []
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[2 <./Tuning_Curves.png>]
+[3 <./Tuning_Curves.png>] [4 <./Fixed_Gains.png> <./Variable_Gains.png>]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-(./Approximately Bayesian Demixing with Neural Networks.bbl [3 <./Fixed_Gains.p
-ng> <./Variable_Gains.png>])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 96.
- [4 <./High-Low_Gains.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 96.
+
+LaTeX Warning: Citation `?' on page 5 undefined on input line 119.
+
+<Sum_Precisions.png, id=93, 536.0025pt x 525.965pt>
+File: Sum_Precisions.png Graphic file (type png)
+ <use Sum_Precisions.png>
+Package pdftex.def Info: Sum_Precisions.png used on input line 122.
+(pdftex.def)             Requested size: 198.7425pt x 195.01329pt.
+
+<Linear_Combination_Precisions.png, id=94, 536.0025pt x 516.93124pt>
+File: Linear_Combination_Precisions.png Graphic file (type png)
+
+<use Linear_Combination_Precisions.png>
+Package pdftex.def Info: Linear_Combination_Precisions.png used on input line 1
+29.
+(pdftex.def)             Requested size: 198.7425pt x 191.66383pt.
+
+<Linear_Fixed_Gains_Precisions.png, id=95, 522.95375pt x 504.88625pt>
+File: Linear_Fixed_Gains_Precisions.png Graphic file (type png)
+
+<use Linear_Fixed_Gains_Precisions.png>
+Package pdftex.def Info: Linear_Fixed_Gains_Precisions.png used on input line 1
+36.
+(pdftex.def)             Requested size: 198.7425pt x 191.87416pt.
+File: Linear_Fixed_Gains_Precisions.png Graphic file (type png)
+
+<use Linear_Fixed_Gains_Precisions.png>
+Package pdftex.def Info: Linear_Fixed_Gains_Precisions.png used on input line 1
+43.
+(pdftex.def)             Requested size: 198.7425pt x 191.87416pt.
+ [5 <./High-Low_Gains.png>] [6 <./Single_Estimation.png> <./Sum_Precisions.png>
+] [7 <./Linear_Combination_Precisions.png> <./Linear_Fixed_Gains_Precisions.png
+>]
+(./Approximately Bayesian Demixing with Neural Networks.bbl [8])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 159.
+ [9]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 159.
 
 (./Approximately Bayesian Demixing with Neural Networks.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 96.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 96.
-Package rerunfilecheck Info: File `"Approximately Bayesian Demixing with Neural
- Networks".out' has not changed.
-(rerunfilecheck)             Checksum: 8A6B914143807299A4BB68C33B37AE62;135.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 96.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 159.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 159.
+
+
+Package rerunfilecheck Warning: File `"Approximately Bayesian Demixing with Neu
+ral Networks".out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `"Approximately Bayesian Demixing wi
+th Neural Networks".out':
+(rerunfilecheck)             Before: C4E26180D06F36C148F01501E1E60120;268
+(rerunfilecheck)             After:  4F866C6988F52C19634BD8CD85A098DB;313.
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 159.
  ) 
 Here is how much of TeX's memory you used:
- 6332 strings out of 493117
- 91810 string characters out of 6135433
- 184322 words of memory out of 5000000
- 9702 multiletter control sequences out of 15000+600000
+ 6387 strings out of 493117
+ 92870 string characters out of 6135433
+ 194623 words of memory out of 5000000
+ 9732 multiletter control sequences out of 15000+600000
  18418 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,8n,39p,1736b,431s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,8n,39p,1813b,427s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2014/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/te
-xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/tex
-live/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texl
-ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texliv
-e/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/
-2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/20
-14/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2014/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2014/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2014/texmf
--dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2014/texmf-dist/fo
-nts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/
-urw/times/utmr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/urw/times/
-utmri8a.pfb>
-Output written on "Approximately Bayesian Demixing with Neural Networks.pdf" (4
- pages, 494548 bytes).
+xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></usr/local/texl
+ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texli
+ve/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texliv
+e/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive/
+2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/20
+14/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2014
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2014/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2014/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2014/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2014/texmf-dist
+/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/t
+ype1/urw/times/utmb8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/urw/t
+imes/utmr8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/urw/times/utmri
+8a.pfb>
+Output written on "Approximately Bayesian Demixing with Neural Networks.pdf" (9
+ pages, 893930 bytes).
 PDF statistics:
- 120 PDF objects out of 1000 (max. 8388607)
- 92 compressed objects within 1 object stream
- 21 named destinations out of 1000 (max. 500000)
- 45 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 198 PDF objects out of 1000 (max. 8388607)
+ 151 compressed objects within 2 object streams
+ 41 named destinations out of 1000 (max. 500000)
+ 86 words of extra memory for PDF output out of 10000 (max. 10000000)
 
