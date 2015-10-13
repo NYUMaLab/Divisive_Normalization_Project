@@ -10,6 +10,7 @@ import os
 import multiprocessing as mp
 import demixing as dm
 from demixing import MLP, HiddenLayer
+from scipy.stats import kurtosis
 
 def main():
 	i = int(sys.argv[1])
@@ -52,14 +53,17 @@ def main():
 	lin_preds = dm.get_hu_responses(hus, nn_lin)
 	full_preds, _ = dm.test_nn(nn_full, nnx_full, validset_r)
 	sum_preds = np.sum(hus, axis=1)
+	kurt_preds = kurtosis(hus, axis=1)
 	vp = np.concatenate((vpost.T[0], vpost.T[1]))
 	lin_preds = np.concatenate((lin_preds.T[0], lin_preds.T[1]))
 	full_preds = np.concatenate((full_preds.T[0], full_preds.T[1]))
 	sum_preds = np.concatenate((sum_preds, sum_preds))
+	kurt_preds = np.concatenate((kurt_preds, kurt_preds))
 
 	lin_corr = np.corrcoef(vp, lin_preds)
 	full_corr = np.corrcoef(vp, full_preds)
 	sum_corr = np.corrcoef(vp, sum_preds)
+	kurt_corr = np.corrcoef(vp, kurt_preds)
 
 	pkl_file = open('readout_' + str(j) + '_' + str(i) + '.pkl', 'wb')
 	pickle.dump((lin_preds, lin_corr, full_preds, full_corr, sum_preds, sum_corr, valid_mse_lin, valid_mse_full, vp), pkl_file)
