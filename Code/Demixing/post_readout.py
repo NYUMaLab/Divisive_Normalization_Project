@@ -46,7 +46,7 @@ def main():
 	validset_r = r_shuf[0:2000], y_shuf[0:2000]
 	trainset_r = r_shuf[2000:], y_shuf[2000:]
 
-	nn_lin, nnx_lin, valid_mse_lin = dm.train_nn(trainset_hid, valid_dataset=validset_hid, n_in=20, learning_rate=0.0001, n_epochs=100, linear=True, rho=.9, mu=.99, nesterov=True)
+	nn_lin, nnx_lin, valid_mse_lin = dm.train_nn(trainset_hid, valid_dataset=validset_hid, n_in=20, learning_rate=0.00001, n_epochs=100, linear=True, rho=.9, mu=.99, nesterov=True)
 	nn_full, nnx_full, valid_mse_full = dm.train_nn(trainset_r, valid_dataset=validset_r, learning_rate=0.0001, mult_ys=False, n_epochs=100, rho=.9, mu=.99, nesterov=True)
 
 	hus, vpost = validset_hid
