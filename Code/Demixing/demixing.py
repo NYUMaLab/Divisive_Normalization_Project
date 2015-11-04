@@ -708,9 +708,9 @@ def get_hu_responses(r, nn):
     trials = python_relu(np.dot(r, W) + b)
     return trials
 
-def get_mean_acts(s_arr, nn, c):
+def get_mean_acts(s_arr, nn, c, hus=20):
     l_sarr = len(s_arr)
-    acts = np.zeros((l_sarr, l_sarr, 20))
+    acts = np.zeros((l_sarr, l_sarr, hus))
     perm_cs = cartesian(c)
     for i in range(l_sarr):
         for j in range(i+1, l_sarr):

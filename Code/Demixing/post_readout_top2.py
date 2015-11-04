@@ -15,18 +15,18 @@ def main():
 	i = int(sys.argv[1])
 	j = int(sys.argv[2])
 
-	file_name = 'Minicon_Outputs/output_nn_tests_' + str(j) + '/nn_tests_' + str(j) + '_' + str(i) + '.pkl'
+	file_name = 'output_nn_runs_' + str(j) + '/nn_runs_' + str(j) + '_' + str(i) + '.pkl'
 	if os.path.isfile(file_name):
 	    pkl_file = open(file_name, 'rb')
 	    nn, nnx, valid_mse, _, _ = pickle.load(pkl_file)
 	c_arr = [[[1, 2, 4], [1, 2, 4]]]
 	s_arr = np.linspace(-60, 60, 120)
-	acts = dm.get_mean_acts(s_arr, nn, c_arr[0])
+	acts = dm.get_mean_acts(s_arr, nn, c_arr[0], hus=100)
 
 	posts = {}
 	testsets = {}
 	for s_i in range(31):
-	    file_name = 'Minicon_Outputs/output_post_2/post_2_' + str(s_i) + '.pkl'
+	    file_name = 'output_post_3/post_3_' + str(s_i) + '.pkl'
 	    if os.path.isfile(file_name):
 	        pkl_file = open(file_name, 'rb')
 	        p, r, c, delta_s = pickle.load(pkl_file)
