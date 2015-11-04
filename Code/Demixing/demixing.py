@@ -304,7 +304,7 @@ def relu(x):
     return theano.tensor.switch(x<0, 0, x)
 
 class HiddenLayer(object):
-    def __init__(self, rng, input, n_in, n_out, W=None, b=None,
+    def __init__(self, rng, input, n_in, n_out, W=None, b=None, COM=False,
                  activation=T.nnet.sigmoid):
         """
         Typical hidden layer of a MLP: units are fully-connected and have
@@ -333,25 +333,35 @@ class HiddenLayer(object):
             
             W = theano.shared(value=W_values, name='W', borrow=True)
 
-        if b is None:
-            b_values = np.zeros((n_out,), dtype=theano.config.floatX)
-            b = theano.shared(value=b_values, name='b', borrow=True)
+        if COM:
+            self.W = W
+            
+            ones = np.ones((n_in, n_out))
+            
+            self.output = T.dot(input, self.W)/T.dot(input, ones)
+            
+            # parameters of the model
+            self.params = [self.W]
+        else:
+            if b is None:
+                b_values = np.zeros((n_out,), dtype=theano.config.floatX)
+                b = theano.shared(value=b_values, name='b', borrow=True)
 
-        self.W = W
-        self.b = b
+            self.W = W
+            self.b = b
 
-        lin_output = T.dot(input, self.W) + self.b
-        self.output = (
-            lin_output if activation is None
-            else activation(lin_output)
-        )
-        # parameters of the model
-        self.params = [self.W, self.b]
+            lin_output = T.dot(input, self.W) + self.b
+            self.output = (
+                lin_output if activation is None
+                else activation(lin_output)
+            )
+            # parameters of the model
+            self.params = [self.W, self.b]
 
 class MLP(object):
 
 
-    def __init__(self, rng, input, n_in, n_hidden, n_out):
+    def __init__(self, rng, input, n_in, n_hidden, n_out, COM=False):
         """Initialize the parameters for the multilayer perceptron
 
         :type rng: np.random.RandomState
@@ -379,18 +389,26 @@ class MLP(object):
             input=input,
             n_in=n_in,
             n_out=n_hidden,
-            #activation=T.nnet.sigmoid
             activation=relu
         )
         
-        self.hiddenLayer2 = HiddenLayer(
-            rng=rng,
-            input=self.hiddenLayer1.output,
-            n_in=n_hidden,
-            n_out=n_out,
-            #activation=relu
-            activation=None
-        )
+        if COM:
+            self.hiddenLayer2 = HiddenLayer(
+                rng=rng,
+                input=self.hiddenLayer1.output,
+                n_in=n_hidden,
+                n_out=n_out,
+                COM=True,
+                activation=None
+            )
+        else:
+            self.hiddenLayer2 = HiddenLayer(
+                rng=rng,
+                input=self.hiddenLayer1.output,
+                n_in=n_hidden,
+                n_out=n_out,
+                activation=None
+            )
         
         self.y_pred = self.hiddenLayer2.output
         
@@ -498,7 +516,7 @@ def shared_dataset(data_xy, borrow=True, no_c=False):
                                  borrow=borrow)
         return shared_x, shared_y
 
-def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=20, linear=False, print_valid=False, mult_ys=True, rho=0, nesterov=True, mu=0, n_in=61, n_out=2):
+def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01, n_epochs=10, batch_size=20, COM=False, linear=False, print_valid=False, mult_ys=True, rho=0, nesterov=True, mu=0, n_in=61, n_out=2):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
@@ -538,6 +556,8 @@ def train_nn(train_dataset, valid_dataset=None, n_hidden=20, learning_rate=0.01,
     # construct the MLP class
     if linear:
         nn = Perceptron(rng=rng, input=x, n_in=n_in, n_out=n_out)
+    elif COM:
+        nn = MLP(rng=rng, input=x, n_in=n_in, n_hidden=n_hidden, n_out=n_out, COM=True)
     else:
         nn = MLP(rng=rng, input=x, n_in=n_in, n_hidden=n_hidden, n_out=n_out)
     

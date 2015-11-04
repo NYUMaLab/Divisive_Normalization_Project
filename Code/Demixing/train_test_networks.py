@@ -37,7 +37,8 @@ def main():
         train_data = dm.generate_trainset(270000, highlow = True, discrete_c=tc, r_max=1)
     
     valid_data = dm.generate_testset(900, discrete_c=c, r_max=1)
-    nn, nnx, valid_mse = dm.train_nn(train_data, n_hidden=100, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
+    #nn, nnx, valid_mse = dm.train_nn(train_data, n_hidden=100, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True)
+    nn, nnx, valid_mse = dm.train_nn(train_data, n_hidden=100, valid_dataset=valid_data, learning_rate=0.0001, n_epochs=100, rho=.9, mu=.99, nesterov=True, COM=True)
 
     num_deltas = 30
     s1 = -30
