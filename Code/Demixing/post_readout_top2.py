@@ -57,8 +57,8 @@ def main():
 
 	sort_acts = np.argsort(int_acts)
 
-	trainset_top2 = (trainset_hus[0][:, sort_acts[0:1]], trainset_hus[1])
-	validset_top2 = (validset_hus[0][:, sort_acts[0:1]], validset_hus[1])
+	trainset_top2 = (trainset_hus[0][:, sort_acts[-1:-3:-1]], trainset_hus[1])
+	validset_top2 = (validset_hus[0][:, sort_acts[-1:-3:-1]], validset_hus[1])
 
 	weights_hus = np.linalg.lstsq(trainset_hus[0], trainset_hus[1])[0]
 	weights_top2 = np.linalg.lstsq(trainset_top2[0], trainset_top2[1])[0]
