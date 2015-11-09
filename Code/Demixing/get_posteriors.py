@@ -20,6 +20,8 @@ def main():
     
     if j == 1:
         c_arr = [[[1], [1]], [[2], [2]], [[4], [4]], [[1], [4]], [[4], [1]]]
+    elif j == 4:
+        c_arr = dm.cartesian([[1, 2, 4], [1, 2, 4]], lists=True)
     else:
         c_arr = [[[1, 2, 4], [1, 2, 4]]]
         
@@ -29,7 +31,7 @@ def main():
     c = c_arr[i]
 
     post_func = dm.posterior_setup(discrete_c=c, num_s=60, r_max=1)
-    if j == 3:
+    if j == 3 or j == 4:
     	test_data = dm.generate_trainset(4500, discrete_c=c, r_max=1)
     else:
 	    s1 = -30

@@ -12,7 +12,7 @@ sprefs = np.linspace(min_angle, max_angle, nneuron)
 eps = np.finfo(np.float64).eps
 sigtc_sq = float(10**2)
 
-def cartesian(arrays, out=None):
+def cartesian(arrays, out=None, lists=False):
     """Generate a cartesian product of input arrays.
     Parameters
     ----------
@@ -53,6 +53,12 @@ def cartesian(arrays, out=None):
 
     for n, arr in enumerate(arrays):
         out[:, n] = arrays[n][ix[:, n]]
+
+    if lists:
+        out_list = []
+        for i in range(len(out)):
+            out_list.append([[out[i][0]], [out[i][1]]])
+        out = out_list
 
     return out
 
