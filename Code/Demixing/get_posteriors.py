@@ -34,9 +34,9 @@ def main():
     else:
 	    s1 = -30
 	    test_data = dm.generate_testset(4500, stim_0=s1, stim_1=s1+delta_s, discrete_c=c, r_max=1)
-    r, _, _ = test_data
+    r, test_ss, test_cs = test_data
     posts = dm.get_posteriors_pool(r, post_func)
-    output = (posts, r, c, delta_s)
+    output = (posts, r, test_cs, test_ss, delta_s)
 
     file_name = "post_" + str(j) + "_" + str(s_i) + ".pkl"
 
