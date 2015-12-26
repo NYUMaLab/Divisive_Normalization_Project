@@ -1,7 +1,7 @@
 import numpy as np
 import theano
 import theano.tensor as T
-from scipy.stats import poisson
+from scipy.stats import poisson, kurtosis
 from functools import partial
 import multiprocessing as mp
 
@@ -741,6 +741,7 @@ def get_corrs(nns, testsets, posts_v1, posts_v2, rand_nn=False):
 
     keys = posts_v1.keys()     
     for i in range(200):
+        print i
         if rand_nn:
             nn = nns[i]
         else:
@@ -832,5 +833,5 @@ def get_corrs(nns, testsets, posts_v1, posts_v2, rand_nn=False):
         kurt_corrs_all[i] = np.corrcoef(vp, kurt_preds)[0, 1]
         sum_corrs_all[i] = np.corrcoef(vp, sum_preds)[0, 1]
 
-        return lin_corrs_ins, lin_corrs_hus, lin_corrs_ins_opt, lin_corrs_hus_opt, kurt_corrs, sum_corrs, lin_corrs_ins_all, lin_corrs_hus_all, kurt_corrs_all, sum_corrs_all
+    return lin_corrs_ins, lin_corrs_hus, lin_corrs_ins_opt, lin_corrs_hus_opt, kurt_corrs, sum_corrs, lin_corrs_ins_all, lin_corrs_hus_all, kurt_corrs_all, sum_corrs_all
 
