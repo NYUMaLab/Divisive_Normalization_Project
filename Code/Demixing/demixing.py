@@ -726,7 +726,7 @@ def get_mean_acts(s_arr, nn, c, hus=20):
             acts[i][j] = np.mean(get_hu_responses(r, nn), axis=0)
     return np.array(acts)
 
-def get_corrs(nn, posts_v1, posts_v2, rand_nn=False):
+def get_corrs(nns, testsets, posts_v1, posts_v2, rand_nn=False):
     lin_corrs_ins = np.zeros((9, 200))
     lin_corrs_hus = np.zeros((9, 200))
     lin_corrs_ins_opt = np.zeros((9, 200))
@@ -741,7 +741,10 @@ def get_corrs(nn, posts_v1, posts_v2, rand_nn=False):
 
     keys = posts_v1.keys()     
     for i in range(200):
-        print i
+        if rand_nn:
+            nn = nns[i]
+        else:
+            nn, nnx, valid_mse = nns[i]
         validset_ins = {}
         trainset_ins = {}
         train_ins_0 = []
