@@ -17,18 +17,18 @@ def main():
 	nneuron = 61
 	n_hus = 1000
 
-	file_name = 'output_nn_runs_2/nn_runs_2_' + str(i) + '.pkl'
-	if os.path.isfile(file_name):
-	    pkl_file = open(file_name, 'rb')
+	nn_file_name = 'output_nn_runs_2/nn_runs_2_' + str(i) + '.pkl'
+	if os.path.isfile(nn_file_name):
+	    pkl_file = open(nn_file_name, 'rb')
 	    nn, nnx, valid_mse, _, _ = pickle.load(pkl_file)
 
 	posts_v1 = {}
 	posts_v2 = {}
 	testsets = {}
 	for s_i in range(90):
-	    file_name = 'output_post_4/post_4_' + str(s_i) + '.pkl'
-	    if os.path.isfile(file_name):
-	        pkl_file = open(file_name, 'rb')
+	    post_file_name = 'output_post_4/post_4_' + str(s_i) + '.pkl'
+	    if os.path.isfile(post_file_name):
+	        pkl_file = open(post_file_name, 'rb')
 	        p, r, c, s, delta_s = pickle.load(pkl_file)
 	        tc_i = tuple(c[i])
 	        if tc_i in posts_v1:
@@ -57,7 +57,8 @@ def main():
 
 	out = (nn, lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca)
 
-	pkl_file = open(file_name, 'wb')
+	out_file_name = 'rand_nets_' + str(i) + '.pkl'
+	pkl_file = open(out_file_name, 'wb')
 	pickle.dump(out, pkl_file)
 	pkl_file.close()
 
