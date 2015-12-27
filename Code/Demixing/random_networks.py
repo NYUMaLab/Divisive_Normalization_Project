@@ -47,7 +47,7 @@ def main():
 
 	lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca = dm.get_corr(rand_nns_large[i], testsets, posts_v1, posts_v2, rand_nn=True)
 
-	file_name = "nn_runs_" + str(j) + "_" + str(i) + ".pkl"
+	file_name = "rand_net_" + str(j) + "_" + str(i) + ".pkl"
 
 	out = (nn, lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca )
 
