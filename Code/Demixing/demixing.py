@@ -727,111 +727,136 @@ def get_mean_acts(s_arr, nn, c, hus=20):
     return np.array(acts)
 
 def get_corrs(nns, testsets, posts_v1, posts_v2, rand_nn=False):
-    lin_corrs_ins = np.zeros((9, 200))
-    lin_corrs_hus = np.zeros((9, 200))
-    lin_corrs_ins_opt = np.zeros((9, 200))
-    lin_corrs_hus_opt = np.zeros((9, 200))
-    kurt_corrs = np.zeros((9, 200))
-    sum_corrs = np.zeros((9, 200))
+    n_nns = len(nns)
+    n_testsets = len(testsets)
+    lin_corrs_ins = np.zeros((n_testsets, n_nns))
+    lin_corrs_hus = np.zeros((n_testsets, n_nns))
+    lin_corrs_ins_opt = np.zeros((n_testsets, n_nns))
+    lin_corrs_hus_opt = np.zeros((n_testsets, n_nns))
+    kurt_corrs = np.zeros((n_testsets, n_nns))
+    sum_corrs = np.zeros((n_testsets, n_nns))
 
-    lin_corrs_ins_all = np.zeros(200)
-    lin_corrs_hus_all = np.zeros(200)
-    kurt_corrs_all = np.zeros(200)
-    sum_corrs_all = np.zeros(200)
+    lin_corrs_ins_all = np.zeros(n_nns)
+    lin_corrs_hus_all = np.zeros(n_nns)
+    kurt_corrs_all = np.zeros(n_nns)
+    sum_corrs_all = np.zeros(n_nns)
 
     keys = posts_v1.keys()     
-    for i in range(200):
+    for i in range(n_nns):
         print i
-        if rand_nn:
-            nn = nns[i]
-        else:
-            nn, nnx, valid_mse = nns[i]
-        validset_ins = {}
-        trainset_ins = {}
-        train_ins_0 = []
-        train_ins_1 = []
-        valid_ins_0 = []
-        valid_ins_1 = []
-        validset_hus = {}
-        trainset_hus = {}
-        train_hus_0 = []
-        train_hus_1 = []
-        valid_hus_0 = []
-        valid_hus_1 = []
-        for k in range(len(keys)):
-            k_i = keys[k]
-            x = testsets[k_i]
-            y = np.array((1/posts_v1[k_i], 1/posts_v2[k_i])).T
-            inds = range(len(x))
-            np.random.shuffle(inds)
-            x_shuf = x[inds]
-            y_shuf = y[inds]
-            if rand_nn:
-                x_hus = python_relu(np.dot(x_shuf, nn['W']) + nn['b'])
-            else:
-                x_hus = get_hu_responses(x_shuf, nn)  
-            validset_ins[k] = x_shuf[0:2000], y_shuf[0:2000]
-            validset_hus[k] = x_hus[0:2000], y_shuf[0:2000]
-            trainset_ins[k] = x_shuf[2000:], y_shuf[2000:]
-            trainset_hus[k] = x_hus[2000:], y_shuf[2000:]
-            valid_ins_0.append(x_shuf[0:2000])
-            valid_ins_1.append(y_shuf[0:2000])
-            valid_hus_0.append(x_hus[0:2000])
-            valid_hus_1.append(y_shuf[0:2000])
-            train_ins_0.append(x_shuf[2000:])
-            train_ins_1.append(y_shuf[2000:])
-            train_hus_0.append(x_hus[2000:])
-            train_hus_1.append(y_shuf[2000:])
-        trainset_ins_all = np.concatenate(train_ins_0), np.concatenate(train_ins_1)
-        trainset_hus_all = np.concatenate(train_hus_0), np.concatenate(train_hus_1)
-        validset_ins_all = np.concatenate(valid_ins_0), np.concatenate(valid_ins_1)
-        validset_hus_all = np.concatenate(valid_hus_0), np.concatenate(valid_hus_1) 
+        lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca = get_corr(nns[i], testsets, posts_v1, posts_v2, rand_nn=True)
 
-        weights_ins = np.linalg.lstsq(trainset_ins_all[0], trainset_ins_all[1])[0]
-        weights_hus = np.linalg.lstsq(trainset_hus_all[0], trainset_hus_all[1])[0]
-        for v in range(len(validset_hus)):
-            weights_ins_opt = np.linalg.lstsq(trainset_ins[v][0], trainset_ins[v][1])[0]
-            weights_hus_opt = np.linalg.lstsq(trainset_hus[v][0], trainset_hus[v][1])[0]
-            
-            hus, vpost = validset_hus[v]
-            inputs, vpost = validset_ins[v]
-            lin_preds_hus = np.dot(hus, weights_hus)
-            lin_preds_ins = np.dot(inputs, weights_ins)
-            lin_preds_hus_opt = np.dot(hus, weights_hus_opt)
-            lin_preds_ins_opt = np.dot(inputs, weights_ins_opt)
-            kurt_preds = kurtosis(hus, axis=1)
-            sum_preds = np.sum(hus, axis=1)
-            vp = np.concatenate((vpost.T[0], vpost.T[1]))
-            lin_preds_ins = np.concatenate((lin_preds_ins.T[0], lin_preds_ins.T[1]))
-            lin_preds_hus = np.concatenate((lin_preds_hus.T[0], lin_preds_hus.T[1]))
-            lin_preds_ins_opt = np.concatenate((lin_preds_ins_opt.T[0], lin_preds_ins_opt.T[1]))
-            lin_preds_hus_opt = np.concatenate((lin_preds_hus_opt.T[0], lin_preds_hus_opt.T[1]))
-            kurt_preds = np.concatenate((kurt_preds, kurt_preds))
-            sum_preds = np.concatenate((sum_preds, sum_preds))
-
-            lin_corrs_ins[v][i] = np.corrcoef(vp, lin_preds_ins)[0, 1]
-            lin_corrs_hus[v][i] = np.corrcoef(vp, lin_preds_hus)[0, 1]
-            lin_corrs_ins_opt[v][i] = np.corrcoef(vp, lin_preds_ins_opt)[0, 1]
-            lin_corrs_hus_opt[v][i] = np.corrcoef(vp, lin_preds_hus_opt)[0, 1]
-            kurt_corrs[v][i] = np.corrcoef(vp, kurt_preds)[0, 1]
-            sum_corrs[v][i] = np.corrcoef(vp, sum_preds)[0, 1]
+        lin_corrs_ins[:, i] = lci
+        lin_corrs_hus[:, i] = lch
+        lin_corrs_ins_opt[:, i] = lcio
+        lin_corrs_hus_opt[:, i] = lcho
+        kurt_corrs[:, i] = kc
+        sum_corrs[:, i] = sc
         
-        hus, vpost = validset_hus_all
-        inputs, vpost = validset_ins_all
-        lin_preds_ins = np.dot(inputs, weights_ins)
+        lin_corrs_ins_all[i] = lcia
+        lin_corrs_hus_all[i] = lcha
+        kurt_corrs_all[i] = kca
+        sum_corrs_all[i] = sca
+
+    return lin_corrs_ins, lin_corrs_hus, lin_corrs_ins_opt, lin_corrs_hus_opt, kurt_corrs, sum_corrs, lin_corrs_ins_all, lin_corrs_hus_all, kurt_corrs_all, sum_corrs_all
+
+
+def get_corr(nn, testsets, posts_v1, posts_v2, rand_nn=False):
+    n_testsets = len(testsets)
+    lin_corrs_ins = np.zeros(n_testsets)
+    lin_corrs_hus = np.zeros(n_testsets)
+    lin_corrs_ins_opt = np.zeros(n_testsets)
+    lin_corrs_hus_opt = np.zeros(n_testsets)
+    kurt_corrs = np.zeros(n_testsets)
+    sum_corrs = np.zeros(n_testsets)
+
+    keys = posts_v1.keys()
+    validset_ins = {}
+    trainset_ins = {}
+    train_ins_0 = []
+    train_ins_1 = []
+    valid_ins_0 = []
+    valid_ins_1 = []
+    validset_hus = {}
+    trainset_hus = {}
+    train_hus_0 = []
+    train_hus_1 = []
+    valid_hus_0 = []
+    valid_hus_1 = []
+    for k in range(len(keys)):
+        k_i = keys[k]
+        x = testsets[k_i]
+        y = np.array((1/posts_v1[k_i], 1/posts_v2[k_i])).T
+        inds = range(len(x))
+        np.random.shuffle(inds)
+        x_shuf = x[inds]
+        y_shuf = y[inds]
+        if rand_nn:
+            x_hus = python_relu(np.dot(x_shuf, nn['W']) + nn['b'])
+        else:
+            x_hus = get_hu_responses(x_shuf, nn)  
+        validset_ins[k] = x_shuf[0:2000], y_shuf[0:2000]
+        validset_hus[k] = x_hus[0:2000], y_shuf[0:2000]
+        trainset_ins[k] = x_shuf[2000:], y_shuf[2000:]
+        trainset_hus[k] = x_hus[2000:], y_shuf[2000:]
+        valid_ins_0.append(x_shuf[0:2000])
+        valid_ins_1.append(y_shuf[0:2000])
+        valid_hus_0.append(x_hus[0:2000])
+        valid_hus_1.append(y_shuf[0:2000])
+        train_ins_0.append(x_shuf[2000:])
+        train_ins_1.append(y_shuf[2000:])
+        train_hus_0.append(x_hus[2000:])
+        train_hus_1.append(y_shuf[2000:])
+    trainset_ins_all = np.concatenate(train_ins_0), np.concatenate(train_ins_1)
+    trainset_hus_all = np.concatenate(train_hus_0), np.concatenate(train_hus_1)
+    validset_ins_all = np.concatenate(valid_ins_0), np.concatenate(valid_ins_1)
+    validset_hus_all = np.concatenate(valid_hus_0), np.concatenate(valid_hus_1) 
+
+    weights_ins = np.linalg.lstsq(trainset_ins_all[0], trainset_ins_all[1])[0]
+    weights_hus = np.linalg.lstsq(trainset_hus_all[0], trainset_hus_all[1])[0]
+    for v in range(len(validset_hus)):
+        weights_ins_opt = np.linalg.lstsq(trainset_ins[v][0], trainset_ins[v][1])[0]
+        weights_hus_opt = np.linalg.lstsq(trainset_hus[v][0], trainset_hus[v][1])[0]
+        
+        hus, vpost = validset_hus[v]
+        inputs, vpost = validset_ins[v]
         lin_preds_hus = np.dot(hus, weights_hus)
+        lin_preds_ins = np.dot(inputs, weights_ins)
+        lin_preds_hus_opt = np.dot(hus, weights_hus_opt)
+        lin_preds_ins_opt = np.dot(inputs, weights_ins_opt)
         kurt_preds = kurtosis(hus, axis=1)
         sum_preds = np.sum(hus, axis=1)
         vp = np.concatenate((vpost.T[0], vpost.T[1]))
         lin_preds_ins = np.concatenate((lin_preds_ins.T[0], lin_preds_ins.T[1]))
         lin_preds_hus = np.concatenate((lin_preds_hus.T[0], lin_preds_hus.T[1]))
+        lin_preds_ins_opt = np.concatenate((lin_preds_ins_opt.T[0], lin_preds_ins_opt.T[1]))
+        lin_preds_hus_opt = np.concatenate((lin_preds_hus_opt.T[0], lin_preds_hus_opt.T[1]))
         kurt_preds = np.concatenate((kurt_preds, kurt_preds))
         sum_preds = np.concatenate((sum_preds, sum_preds))
 
-        lin_corrs_ins_all[i] = np.corrcoef(vp, lin_preds_ins)[0, 1]
-        lin_corrs_hus_all[i] = np.corrcoef(vp, lin_preds_hus)[0, 1]
-        kurt_corrs_all[i] = np.corrcoef(vp, kurt_preds)[0, 1]
-        sum_corrs_all[i] = np.corrcoef(vp, sum_preds)[0, 1]
+        lin_corrs_ins[v] = np.corrcoef(vp, lin_preds_ins)[0, 1]
+        lin_corrs_hus[v] = np.corrcoef(vp, lin_preds_hus)[0, 1]
+        lin_corrs_ins_opt[v] = np.corrcoef(vp, lin_preds_ins_opt)[0, 1]
+        lin_corrs_hus_opt[v] = np.corrcoef(vp, lin_preds_hus_opt)[0, 1]
+        kurt_corrs[v] = np.corrcoef(vp, kurt_preds)[0, 1]
+        sum_corrs[v] = np.corrcoef(vp, sum_preds)[0, 1]
+    
+    hus, vpost = validset_hus_all
+    inputs, vpost = validset_ins_all
+    lin_preds_ins = np.dot(inputs, weights_ins)
+    lin_preds_hus = np.dot(hus, weights_hus)
+    kurt_preds = kurtosis(hus, axis=1)
+    sum_preds = np.sum(hus, axis=1)
+    vp = np.concatenate((vpost.T[0], vpost.T[1]))
+    lin_preds_ins = np.concatenate((lin_preds_ins.T[0], lin_preds_ins.T[1]))
+    lin_preds_hus = np.concatenate((lin_preds_hus.T[0], lin_preds_hus.T[1]))
+    kurt_preds = np.concatenate((kurt_preds, kurt_preds))
+    sum_preds = np.concatenate((sum_preds, sum_preds))
+
+    lin_corrs_ins_all = np.corrcoef(vp, lin_preds_ins)[0, 1]
+    lin_corrs_hus_all = np.corrcoef(vp, lin_preds_hus)[0, 1]
+    kurt_corrs_all = np.corrcoef(vp, kurt_preds)[0, 1]
+    sum_corrs_all = np.corrcoef(vp, sum_preds)[0, 1]
 
     return lin_corrs_ins, lin_corrs_hus, lin_corrs_ins_opt, lin_corrs_hus_opt, kurt_corrs, sum_corrs, lin_corrs_ins_all, lin_corrs_hus_all, kurt_corrs_all, sum_corrs_all
 
