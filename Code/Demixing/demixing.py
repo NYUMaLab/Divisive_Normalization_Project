@@ -762,6 +762,7 @@ def get_corrs(nns, testsets, posts_v1, posts_v2, rand_nn=False):
 
 
 def get_corr(nn, testsets, posts_v1, posts_v2, rand_nn=False):
+    print "in!"
     n_testsets = len(testsets)
     lin_corrs_ins = np.zeros(n_testsets)
     lin_corrs_hus = np.zeros(n_testsets)
@@ -784,6 +785,7 @@ def get_corr(nn, testsets, posts_v1, posts_v2, rand_nn=False):
     valid_hus_0 = []
     valid_hus_1 = []
     for k in range(len(keys)):
+        print "k", k
         k_i = keys[k]
         x = testsets[k_i]
         y = np.array((1/posts_v1[k_i], 1/posts_v2[k_i])).T
@@ -815,6 +817,7 @@ def get_corr(nn, testsets, posts_v1, posts_v2, rand_nn=False):
     weights_ins = np.linalg.lstsq(trainset_ins_all[0], trainset_ins_all[1])[0]
     weights_hus = np.linalg.lstsq(trainset_hus_all[0], trainset_hus_all[1])[0]
     for v in range(len(validset_hus)):
+        print "v", v
         weights_ins_opt = np.linalg.lstsq(trainset_ins[v][0], trainset_ins[v][1])[0]
         weights_hus_opt = np.linalg.lstsq(trainset_hus[v][0], trainset_hus[v][1])[0]
         
