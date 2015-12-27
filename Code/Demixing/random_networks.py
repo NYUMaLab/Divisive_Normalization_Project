@@ -53,8 +53,6 @@ def main():
 
 	lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca = dm.get_corr(rand_nn, testsets, posts_v1, posts_v2, rand_nn=True)
 
-	file_name = "rand_net_" + str(j) + "_" + str(i) + ".pkl"
-
 	out = (nn, lci, lch, lcio, lcho, kc, sc, lcia, lcha, kca, sca)
 
 	out_file_name = 'rand_nets_' + str(i) + '.pkl'
